@@ -1,12 +1,23 @@
-import socket
-s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(('10.43.0.1', 11008))
-s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-s.settimeout(3)
+import pyvisa
 
-for i in range (2):
-	s.send('*IDN?\n'.encode())
-	back = s.recv(1000)
-	print(back)
-	
-s.close()
+ip = "10.43.0.1"
+port = "11008"
+
+defaultPulsePin = "RBPI07"
+defaultDirPin = "RBPI29"
+defaultEndSwitch1Pin = "RBPI27"
+defaultEndSwitch2Pin = "RBPI28"
+defaultPWMDevice = "PWM0"
+
+rm = pyvisa.ResourceManager()
+inst = rm.open_resource(f'TCPIP::{ip}::{port}::SOCKET',
+                        open_timeout=10000)
+inst.timeout = 2000
+inst.write_termination = '\n'
+inst.read_termination = '\n'
+
+inst.clear()
+inst.flush(pyvisa.constants.BufferOperation.discard_read_buffer)
+idn = inst.query('*IDN?')
+
+print(idn)
