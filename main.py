@@ -9,6 +9,8 @@ class PYNQ:
     defaultPWM = 0
     defaultPWMDevice = "PWM0"
 
+    STATES = ["LOW", "HIGH"]
+
     def __init__(self,
                 ip:str = "10.43.0.1", 
                 port = "11008"):
@@ -49,6 +51,16 @@ class PYNQ:
 
         self.write(f':GPRIO:DIR {pin}, {dir}')
 
+    def digiWrite(self,
+                  pin: str,
+                  state: bool):
+        '''
+        Write to digital pin
+        '''
+        statestring = self.STATES[state]
+        self.write(f':GPIO:LEVEL {pin}, {statestring}')
+
+
     def setPWM(self,
                pwm: int, # PWM module selection
                frequency: float,
@@ -86,12 +98,21 @@ class PYNQ:
 
         self.setPWM(self.defaultPWM, 0, 0, 0)
 
-    def stepMot(self,
-                steps:int):
-        pass
+    def startMoving(self,
+                direction: bool,
+                steps:int,
+                frequency: float = 1e3):
+        self.digiWrite(self.defaultDirPin, direction)
+        self.setPWM(
+            pwm=self.defaultPWM,
+            frequency=frequency,
+            duty=0.1,
+            steps=steps
+        )
         
 
 pynq = PYNQ()   
 
 print(pynq.idn)
 pynq.initMot()
+pynq.startMoving(0, 1000)
