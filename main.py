@@ -6,6 +6,7 @@ class PYNQ:
     defaultDirPin = "RBPI29"
     defaultEndSwitch1Pin = "RBPI27"
     defaultEndSwitch2Pin = "RBPI28"
+    defaultPWM = 0
     defaultPWMDevice = "PWM0"
 
     def __init__(self,
@@ -40,6 +41,14 @@ class PYNQ:
         for command in commands:
             self.write(command)
 
+    def setDir(self,
+               pin: str,
+               dir: str):
+        dir = dir.upper()
+        assert (dir == 'IN') or (dir == 'OUT')
+
+        self.write(f':GPRIO:DIR {pin}, {dir}')
+
     def setPWM(self,
                pwm: int, # PWM module selection
                frequency: float,
@@ -70,11 +79,19 @@ class PYNQ:
                      ])
 
 
+    def initMot(self):
+        self.setDir(self.defaultDirPin, "OUT")
+        self.setDir(self.defaultEndSwitch1Pin, "IN")
+        self.setDir(self.defaultEndSwitch2Pin, "IN")
+
+        self.setPWM(self.defaultPWM, 0, 0, 0)
+
     def stepMot(self,
                 steps:int):
         pass
+        
 
 pynq = PYNQ()   
 
 print(pynq.idn)
-pynq.setPWM(0, 10, 0.5, 10)
+pynq.initMot()
