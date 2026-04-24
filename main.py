@@ -1,4 +1,12 @@
-import numpy as np
+import socket
+s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(('10.43.0.1', 11008))
+s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+s.settimeout(3)
 
-if __name__ == '__main__':
-    print('aa')
+for i in range (2):
+	s.send('*IDN?\n'.encode())
+	back = s.recv(1000)
+	print(back)
+	
+s.close()
