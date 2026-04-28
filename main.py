@@ -2,8 +2,6 @@ import pyvisa
 from math import floor
 import time
 
-DEBUG = True
-
 class PYNQ:
     defaultPulsePin = "RBPI07"
     defaultDirPin = "RBPI29"
@@ -16,9 +14,11 @@ class PYNQ:
 
     def __init__(self,
                 ip:str = "10.43.0.1", 
-                port = "11008"):
+                port:str = "11008",
+                DEBUG: bool = False):
         self.ip = ip
         self.port = port
+        self.DEBUG = DEBUG
 
         self.rm = pyvisa.ResourceManager()
         self.inst = self.rm.open_resource(f'TCPIP::{ip}::{port}::SOCKET',
@@ -38,7 +38,7 @@ class PYNQ:
     
     def write(self, 
               command: str):
-        if DEBUG:                
+        if self.DEBUG:                
             print(f'{command}')
         self.inst.write(command)
 
@@ -118,7 +118,7 @@ class PYNQ:
         )
         
 
-pynq = PYNQ()   
+pynq = PYNQ(DEBUG=True)   
 
 print(pynq.idn)
 pynq.initMot()
