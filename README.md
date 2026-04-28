@@ -1,3 +1,5 @@
+### 3scope
+The software for controlling the autofocus project in the TUe 31DAE course
 
 ### Setup project
 Backend: (cd backend)
@@ -26,3 +28,7 @@ nvm install 25.9.0
 nvm use 25.9.0
 npm i
 ```
+
+### Run project
+The camera should be connected by USB to the host PC.
+The PYNQ board is connected by ethernet, default connection is to 10.43.0.1:11008.
