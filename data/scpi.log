@@ -1,0 +1,66 @@
+DEBUG: Flushed buffers.
+*IDN?
+"TUE,PYNQRYB,February 2025,1.4"
+DEBUG: Flushed buffers.
+DEBUG: Flushed buffers.
+*IDN?
+"TUE,PYNQRYB,February 2025,1.4"
+DEBUG: Flushed buffers.
+:GPIO:RST
+DEBUG: Flushed buffers.
+:SWITCHBOX:RST
+DEBUG: Flushed buffers.
+:GPIO:DIR LD0,Out;DIR LD1,Out;DIR LD2,Out;DIR LD3,Out
+DEBUG: Flushed buffers.
+:GPIO:DIR LD4R,Out;DIR LD4G,Out;DIR LD4B,Out;DIR LD5R,Out;DIR LD5G,Out;DIR LD5B,Out
+DEBUG: Flushed buffers.
+:GPIO:DIR BTN0,In;DIR BTN1,In;DIR BTN2,In;DIR BTN3,In;DIR SW0,In;DIR SW1,In
+DEBUG: Flushed buffers.
+:SYSTEM:Timeset '20260428120624'
+DEBUG: Flushed buffers.
+:GPIO:LEVEL LD0, HIGH
+DEBUG: Flushed buffers.
+:GPIO:LEVEL LD1, HIGH
+DEBUG: Flushed buffers.
+:GPIO:LEVEL LD2, HIGH
+DEBUG: Flushed buffers.
+:GPIO:LEVEL LD3, HIGH
+DEBUG: Flushed buffers.
+:GPIO:LEVEL LD0, LOW
+DEBUG: Flushed buffers.
+:GPIO:LEVEL LD1, LOW
+DEBUG: Flushed buffers.
+:GPIO:LEVEL LD2, LOW
+DEBUG: Flushed buffers.
+:GPIO:LEVEL LD3, LOW
+DEBUG: Flushed buffers.
+*IDN?
+"TUE,PYNQRYB,February 2025,1.4"
+DEBUG: Flushed buffers.
+:PWM0:PERIOD 0
+DEBUG: Flushed buffers.
+:PWM0:DUTY 0
+DEBUG: Flushed buffers.
+:PWM0:STEPS 0
+DEBUG: Flushed buffers.
+:SWITCHBOX:MAP RBPI07,PWM0
+DEBUG: Flushed buffers.
+:SWITCHBOX:MAP RBPI29,GPIO
+DEBUG: Flushed buffers.
+:SWITCHBOX:MAP RBPI27,GPIO
+DEBUG: Flushed buffers.
+:SWITCHBOX:MAP RBPI28,GPIO
+DEBUG: Flushed buffers.
+:GPIO:DIR RBPI29, OUT
+DEBUG: Flushed buffers.
+:GPIO:DIR RBPI27, IN
+DEBUG: Flushed buffers.
+:GPIO:DIR RBPI28, IN
+DEBUG: Flushed buffers.
+:GPIO:LEVEL RBPI29, HIGH
+DEBUG: Flushed buffers.
+:PWM0:PERIOD 1000000
+DEBUG: Flushed buffers.
+:PWM0:DUTY 100000
+DEBUG: Flushed buffers.
+:PWM0:STEPS 300
