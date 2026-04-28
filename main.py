@@ -2,6 +2,8 @@ import pyvisa
 from math import floor
 import time
 
+DEBUG = True
+
 class PYNQ:
     defaultPulsePin = "RBPI07"
     defaultDirPin = "RBPI29"
@@ -23,7 +25,6 @@ class PYNQ:
                         open_timeout=10000)
         #print(self.rm.list_resources())
 
-
         self.inst.timeout = 2000
         self.inst.write_termination = '\n'
         self.inst.read_termination  = '\n'
@@ -37,8 +38,9 @@ class PYNQ:
     
     def write(self, 
               command: str):
+        if DEBUG:                
+            print(f'{command}')
         self.inst.write(command)
-        print(f'{command}')
 
     def writes(self,
                commands: list[str]):
@@ -120,5 +122,4 @@ pynq = PYNQ()
 
 print(pynq.idn)
 pynq.initMot()
-pynq.startMoving(0, 1000)
-pynq.inst.close()
+pynq.startMoving(0, 100)
