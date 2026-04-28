@@ -34,6 +34,7 @@ class PYNQ:
     def write(self, 
               command: str):
         self.inst.write(command)
+        print(f'{command}')
 
     def writes(self,
                commands: list[str]):
@@ -49,7 +50,7 @@ class PYNQ:
         dir = dir.upper()
         assert (dir == 'IN') or (dir == 'OUT')
 
-        self.write(f':GPRIO:DIR {pin}, {dir}')
+        self.write(f':GPIO:DIR {pin}, {dir}')
 
     def digiWrite(self,
                   pin: str,
@@ -116,3 +117,5 @@ pynq = PYNQ()
 print(pynq.idn)
 pynq.initMot()
 pynq.startMoving(0, 1000)
+while True:
+    print(pynq.inst.read_raw(1))
