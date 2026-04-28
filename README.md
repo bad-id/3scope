@@ -2,6 +2,7 @@
 The software for controlling the autofocus project in the TUe 31DAE course
 
 ### Setup project
+
 Backend: (cd backend)
 ```
 conda activate
@@ -20,6 +21,12 @@ If any packages are added or updated, the package should be saved to requirement
 ```
 pip freeze > requirements.txt
 ```
+
+To rebuild the frontend links:
+```
+pyflow run -m ./ -g ../frontend/app/generated
+```
+
 
 Frontend: (cd frontend)
 node.js version 25.9.0 (64-bit)
