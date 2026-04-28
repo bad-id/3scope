@@ -1,5 +1,6 @@
 import pyvisa
 from math import floor
+import time
 
 class PYNQ:
     defaultPulsePin = "RBPI07"
@@ -20,16 +21,19 @@ class PYNQ:
         self.rm = pyvisa.ResourceManager()
         self.inst = self.rm.open_resource(f'TCPIP::{ip}::{port}::SOCKET',
                         open_timeout=10000)
+        #print(self.rm.list_resources())
 
 
         self.inst.timeout = 2000
         self.inst.write_termination = '\n'
-        self.inst.read_termination = '\n'
+        self.inst.read_termination  = '\n'
+        self.inst.StopBits = 1
         
         self.inst.clear()
         self.inst.flush(pyvisa.constants.BufferOperation.discard_read_buffer)
         
         self.idn = self.inst.query('*IDN?')
+        #self.inst.write('*RST')
     
     def write(self, 
               command: str):
@@ -117,5 +121,4 @@ pynq = PYNQ()
 print(pynq.idn)
 pynq.initMot()
 pynq.startMoving(0, 1000)
-while True:
-    print(pynq.inst.read_raw(1))
+pynq.inst.close()
