@@ -14,6 +14,12 @@ class PYNQ:
     defaultPWM = 0
     defaultPWMDevice = "PWM0"
 
+    PYNQ_MODULES = ["GPIO", "UART0_TX", "UART0_RX", "SPICLK0", "MISO0", "MOSI0",
+            "SS0", "SPICLK1", "MISO1", "MOSI1", "SS1", "SDA0", "SCL0", "SDA1", "SCL1",
+            "PWM0", "PWM1","PWM2", "PWM3","PWM4", "PWM5",
+            "PULSECOUNTER0","PULSECOUNTER1",
+            "UART1_TX", "UART1_RX","IIC0_SDA","IIC0_SCL"]
+
     STATES = ["LOW", "HIGH"]
 
     def __init__(self,
@@ -40,6 +46,12 @@ class PYNQ:
         self.idn = self.inst.query('*IDN?')
         #self.inst.write('*RST')
     
+    def query(self,
+              command: str):
+        if self.DEBUG:
+            print(f'{command}')
+        return self.inst.query(command)
+
     def write(self, 
               command: str):
         if self.DEBUG:                
@@ -62,11 +74,22 @@ class PYNQ:
 
         self.write(f':GPIO:DIR {pin}, {dir}')
 
+    def switchBoxMap(self,
+                     pin: str,
+                     module: str):
+        self.write(f'SWITCHBOX:MAP {pin},{module}')
+
     def digiRead(self,
                   pin:str) -> bool:
-        state: str = self.inst.query(f':GPIO:LEVEL? {pin}')
+        resp: str = self.query(f':GPIO:LEVEL? {pin}')
+        if self.DEBUG:
+            print(resp)
 
-        return (state == 'High')
+        if 'High' in resp:
+            return True
+        elif 'Low' in resp:
+            return False
+        raise Exception('Digital read failed')
 
     def digiWrite(self,
                   pin: str,
@@ -116,6 +139,11 @@ class PYNQ:
 
 
     def initMot(self):
+        self.switchBoxMap(self.defaultPulsePin, self.defaultPWMDevice)
+        self.switchBoxMap(self.defaultDirPin, 'GPIO')
+        self.switchBoxMap(self.defaultEndSwitch1Pin, 'GPIO')
+        self.switchBoxMap(self.defaultEndSwitch2Pin, 'GPIO')
+
         self.setDir(self.defaultDirPin, "OUT")
         self.setDir(self.defaultEndSwitch1Pin, "IN")
         self.setDir(self.defaultEndSwitch2Pin, "IN")
@@ -125,7 +153,7 @@ class PYNQ:
     def startMoving(self,
                 direction: bool,
                 steps:int,
-                frequency: float = 1e3):
+                frequency: float = 1e2):
         self.digiWrite(self.defaultDirPin, direction)
         self.setPWM(
             pwm=self.defaultPWM,
