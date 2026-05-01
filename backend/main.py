@@ -5,4 +5,5 @@ if __name__ == '__main__':
 
     print(pynq.idn)
     pynq.initMot()
-    pynq.startMoving(0, 100)
+    pynq.startMoving(0, 1000)
+    print(pynq.endSwitchPushed())

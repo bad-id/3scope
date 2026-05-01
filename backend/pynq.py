@@ -62,6 +62,12 @@ class PYNQ:
 
         self.write(f':GPIO:DIR {pin}, {dir}')
 
+    def digiRead(self,
+                  pin:str) -> bool:
+        state: str = self.inst.query(f':GPIO:LEVEL? {pin}')
+
+        return (state == 'High')
+
     def digiWrite(self,
                   pin: str,
                   state: bool):
@@ -71,6 +77,13 @@ class PYNQ:
         statestring = self.STATES[state]
         self.write(f':GPIO:LEVEL {pin}, {statestring}')
 
+    def endSwitchPushed1(self):
+        return self.digiRead(self.defaultEndSwitch1Pin)
+    def endSwitchPushed2(self):
+        return self.digiRead(self.defaultEndSwitch2Pin)
+    def endSwitchPushed(self):
+        return self.endSwitchPushed1() or self.endSwitchPushed2()
+    
 
     def setPWM(self,
                pwm: int, # PWM module selection
@@ -119,4 +132,12 @@ class PYNQ:
             frequency=frequency,
             duty=0.1,
             steps=steps
+        )
+
+    def stopMoving(self):
+        self.setPWM(
+            pwm=self.defaultPWM,
+            frequency=0,
+            duty=0,
+            steps=0
         )
