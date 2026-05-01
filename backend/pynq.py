@@ -7,6 +7,9 @@ import time # temporary
 def test():
     return 'aa'
 
+class MotorCommandOutOfBounds(Exception):
+    pass
+
 class PYNQ:
     defaultPulsePin = "RBPI07"
     defaultDirPin = "RBPI29"
@@ -24,6 +27,7 @@ class PYNQ:
     STATES = ["LOW", "HIGH"]
 
     DIR_SIGN = [1, -1]
+    MOT_LIMITS = [0, 57000] # 58265/58257 is the max range, for safety 57000 limit
 
     def __init__(self,
                 ip:str = "10.43.0.1", 
@@ -181,9 +185,15 @@ class PYNQ:
                           frequency: float = 4500):
         '''
         Blocks execution while moving, to set direction, make steps negative
+
+        :returns: True if successful, false if failed
         '''
         if self.mot_calibrated:
-            self.mot_absolute_steps += steps
+            new_pos = self.mot_absolute_steps + steps
+            if (new_pos < self.MOT_LIMITS[0]) or (new_pos > self.MOT_LIMITS[1]):
+                raise MotorCommandOutOfBounds
+
+            self.mot_absolute_steps = new_pos
         
         abs_steps = abs(steps)
 
@@ -201,9 +211,18 @@ class PYNQ:
             self.moveRelativeSteps(-1*steps)
         self.stopMoving()
         self.mot_calibrated = True
-        self.mot_absolute_steps = 0
+        self.mot_absolute_steps = self.MOT_LIMITS[0]
 
         if self.DEBUG:
             print('Stopped at zero point')
         return
-        
+    
+    def moveToEnd(self,
+                  steps: int = 100):
+        assert (steps > 0)
+        while (self.endSwitchPushed1() == False):
+            self.moveRelativeSteps(steps)
+        self.stopMoving()
+
+        if self.DEBUG:
+            print('Stopped at end point')
