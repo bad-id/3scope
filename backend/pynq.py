@@ -177,24 +177,28 @@ class PYNQ:
         self.mot_calibrated = False # messy fix, TODO: track pending steps
     
     def moveRelativeSteps(self, 
-                          direction: bool,
-                          steps: int,
+                          steps: int, 
                           frequency: float = 4500):
         '''
-        Blocks execution while moving
+        Blocks execution while moving, to set direction, make steps negative
         '''
         if self.mot_calibrated:
-            self.mot_absolute_steps += self.DIR_SIGN[direction] *steps
+            self.mot_absolute_steps += steps
+        
+        abs_steps = abs(steps)
+
+        direction = (steps < 0)
         self.startMoving(direction=direction,
-                         steps=steps,
+                         steps=abs_steps,
                          frequency=frequency)
-        time.sleep(steps/frequency)
+        time.sleep(abs_steps/frequency)
         
 
     def moveToZero(self,
                    steps: int = 100):
+        assert (steps > 0)
         while (self.endSwitchPushed2() == False):
-            self.moveRelativeSteps(1, steps)
+            self.moveRelativeSteps(-1*steps)
         self.stopMoving()
         self.mot_calibrated = True
         self.mot_absolute_steps = 0

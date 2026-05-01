@@ -5,10 +5,9 @@ if __name__ == '__main__':
 
     print(pynq.idn)
     pynq.initMot()
-    print(pynq.mot_calibrated, pynq.mot_absolute_steps)
     pynq.moveToZero()
-    print(pynq.mot_calibrated, pynq.mot_absolute_steps)
 
-    pynq.moveRelativeSteps(0, 2000)
+    pynq.moveRelativeSteps(2000)
+    pynq.moveRelativeSteps(-1000)
     print(pynq.mot_calibrated, pynq.mot_absolute_steps)
     print('Stopped')
