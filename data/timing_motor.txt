@@ -1,0 +1,9 @@
+15000 steps, 100Hz, 151s
+15000 steps, 200Hz, 74s
+15000 steps, 400Hz, 38s
+15000 steps, 800Hz, 19s
+15000 steps, 1600Hz, 9s
+15000 steps, 3200Hz, 5s
+15000 steps, 4500Hz, 3s
+ 
+manual stopwatch, \pm 1s

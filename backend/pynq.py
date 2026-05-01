@@ -1,6 +1,7 @@
 import pyvisa
 from math import floor
 from pyflow import extensity
+import time # temporary
 
 @extensity
 def test():
@@ -22,6 +23,8 @@ class PYNQ:
 
     STATES = ["LOW", "HIGH"]
 
+    DIR_SIGN = [1, -1]
+
     def __init__(self,
                 ip:str = "10.43.0.1", 
                 port:str = "11008",
@@ -29,6 +32,8 @@ class PYNQ:
         self.ip = ip
         self.port = port
         self.DEBUG = DEBUG
+        self.mot_calibrated = False # Is the absolute positon known
+        self.mot_absolute_steps = 0 # Absolute number of steps from zero position
 
         self.rm = pyvisa.ResourceManager()
         self.inst = self.rm.open_resource(f'TCPIP::{ip}::{port}::SOCKET',
@@ -153,7 +158,7 @@ class PYNQ:
     def startMoving(self,
                 direction: bool,
                 steps:int,
-                frequency: float = 1e2):
+                frequency: float = 4500):
         self.digiWrite(self.defaultDirPin, direction)
         self.setPWM(
             pwm=self.defaultPWM,
@@ -169,3 +174,32 @@ class PYNQ:
             duty=0,
             steps=0
         )
+        self.mot_calibrated = False # messy fix, TODO: track pending steps
+    
+    def moveRelativeSteps(self, 
+                          direction: bool,
+                          steps: int,
+                          frequency: float = 4500):
+        '''
+        Blocks execution while moving
+        '''
+        if self.mot_calibrated:
+            self.mot_absolute_steps += self.DIR_SIGN[direction] *steps
+        self.startMoving(direction=direction,
+                         steps=steps,
+                         frequency=frequency)
+        time.sleep(steps/frequency)
+        
+
+    def moveToZero(self,
+                   steps: int = 100):
+        while (self.endSwitchPushed2() == False):
+            self.moveRelativeSteps(1, steps)
+        self.stopMoving()
+        self.mot_calibrated = True
+        self.mot_absolute_steps = 0
+
+        if self.DEBUG:
+            print('Stopped at zero point')
+        return
+        

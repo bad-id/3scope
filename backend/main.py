@@ -1,9 +1,14 @@
 import pynq
 
 if __name__ == '__main__':
-    pynq = pynq.PYNQ(DEBUG=True)   
+    pynq = pynq.PYNQ(DEBUG=False)   
 
     print(pynq.idn)
     pynq.initMot()
-    pynq.startMoving(0, 1000, frequency=4500)
-    print(pynq.endSwitchPushed())
+    print(pynq.mot_calibrated, pynq.mot_absolute_steps)
+    pynq.moveToZero()
+    print(pynq.mot_calibrated, pynq.mot_absolute_steps)
+
+    pynq.moveRelativeSteps(0, 2000)
+    print(pynq.mot_calibrated, pynq.mot_absolute_steps)
+    print('Stopped')
