@@ -39,6 +39,7 @@ class Camera:
         return None
 
     def check_sharpness(self, image):
+        #The value gets higher when the picture gets sharper
         return cv2.Laplacian(image, cv2.CV_64F).var()
 
     def run(self):
