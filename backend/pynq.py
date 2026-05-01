@@ -100,10 +100,10 @@ class PYNQ:
         statestring = self.STATES[state]
         self.write(f':GPIO:LEVEL {pin}, {statestring}')
 
-    def endSwitchPushed1(self):
-        return self.digiRead(self.defaultEndSwitch1Pin)
+    def endSwitchPushed1(self): # Needs to be inverse
+        return not self.digiRead(self.defaultEndSwitch1Pin)
     def endSwitchPushed2(self):
-        return self.digiRead(self.defaultEndSwitch2Pin)
+        return not self.digiRead(self.defaultEndSwitch2Pin)
     def endSwitchPushed(self):
         return self.endSwitchPushed1() or self.endSwitchPushed2()
     
