@@ -2,5 +2,5 @@
 from pyflow import extensity
 
 @extensity
-def testFunctionStuff():
+def testFunctionStuff() -> str:
     return 'aa'

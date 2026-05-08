@@ -1,17 +1,19 @@
 {
-  "name": "pyflow-ts-codegen",
+  "name": "generated",
   "version": "0.1.0",
   "description": "PyFlow.ts project for codegen",
   "type": "module",
   "scripts": {
-    "start-server": "pyflow run -m ../backend/codegen --port 8000",
+    "generate": "pyflow generate -m ../backend -o ./",
+    "start-server": "pyflow run -m ../backend -g ./ --port 8000",
+    "py-server": "python _server/server.py --debug",
     "start-ts": "tsc --watch",
     "start": "concurrently \"npm run start-server\" \"npm run start-ts\"",
     "build": "tsc",
     "serve": "node dist/index.js",
     "dev": "ts-node --esm src/index.ts"
   },
-  "dependencies": {
+  "peerDependencies": {
     "node-fetch": "^3.3.1"
   },
   "devDependencies": {

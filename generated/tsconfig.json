@@ -10,7 +10,8 @@
     "declaration": true,
     "skipLibCheck": true,
     "noEmitOnError": false,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "noImplicitAny": false
   },
   "include": [
     "src/**/*.ts"
