@@ -37,5 +37,9 @@ npm i
 ```
 
 ### Run project
+On Windows run 
+'''
+PYTHONUTF8=1
+'''
 The camera should be connected by USB to the host PC.
 The PYNQ board is connected by ethernet, default connection is to 10.43.0.1:11008.
