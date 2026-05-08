@@ -1,11 +1,6 @@
 import pyvisa
 from math import floor
-from pyflow import extensity
 import time # temporary
-
-@extensity
-def test():
-    return 'aa'
 
 class MotorCommandOutOfBounds(Exception):
     pass
