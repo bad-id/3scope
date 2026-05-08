@@ -8,6 +8,7 @@ if __name__ == '__main__':
 
     # Start grabbing
     camera.StartGrabbing(pylon.GrabStrategy_LatestImageOnly)
+    camera.ExposureTime.Value = 5000 # default 35000
 
     converter = pylon.ImageFormatConverter()
     converter.OutputPixelFormat = pylon.PixelType_BGR8packed

@@ -1,13 +1,18 @@
 import pynq
+from autofocus import autofocus
+from camera import Camera
 
 if __name__ == '__main__':
-    pynq = pynq.PYNQ(DEBUG=False)   
+    pynq = pynq.PYNQ(DEBUG=False)  
+    camera = Camera() 
 
     print(pynq.idn)
     pynq.initMot()
-    pynq.moveRelativeSteps(-50000)
     pynq.moveToZero()
 
-    pynq.moveRelativeSteps(-100)
-    print(pynq.mot_calibrated, pynq.mot_absolute_steps)
+    autofocus(
+        pynq,
+        camera,
+        110,
+        100, 50)
     print('Stopped')

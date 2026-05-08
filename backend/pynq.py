@@ -206,6 +206,9 @@ class PYNQ:
 
     def moveToZero(self,
                    steps: int = 100):
+        '''
+        :param steps: size of jumps the motor moves in
+        '''
         assert (steps > 0)
         while (self.endSwitchPushed2() == False):
             self.moveRelativeSteps(-1*steps)
