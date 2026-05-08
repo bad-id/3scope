@@ -24,6 +24,9 @@ class Camera:
         self.camera.Close()
         cv2.destroyAllWindows()
 
+    def set_exposure(self, exposure_time_us):
+        self.camera.ExposureTime.SetValue(exposure_time_us)
+        
     def get_frame(self):
         grabResult = self.camera.RetrieveResult(
             5000, pylon.TimeoutHandling_ThrowException

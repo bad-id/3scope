@@ -206,11 +206,14 @@ class PYNQ:
         :param steps: size of jumps the motor moves in
         '''
         assert (steps > 0)
-        while (self.endSwitchPushed2() == False):
-            self.moveRelativeSteps(-1*steps)
-        self.stopMoving()
-        self.mot_calibrated = True
-        self.mot_absolute_steps = self.MOT_LIMITS[0]
+        if self.mot_calibrated:
+            self.moveRelativeSteps(-self.mot_absolute_steps)
+        else:
+            while (self.endSwitchPushed2() == False):
+                self.moveRelativeSteps(-1*steps)
+            self.stopMoving()
+            self.mot_calibrated = True
+            self.mot_absolute_steps = self.MOT_LIMITS[0]
 
         if self.DEBUG:
             print('Stopped at zero point')
