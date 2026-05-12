@@ -41,9 +41,23 @@ class Camera:
         grabResult.Release()
         return None
 
+    def gaussian_blur(self, image):
+        blurred_image = cv2.GaussianBlur(image, (3,3), 0)
+        return blurred_image
+
     def check_sharpness(self, image):
         #The value gets higher when the picture gets sharper
         return cv2.Laplacian(image, cv2.CV_64F).var()
+
+    def tenengrad(self, image):
+        gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        gx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3)
+        gy = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3)
+
+        g = np.sqrt(gx**2 + gy**2)
+
+        return np.mean(g)
 
     def run(self):
         self.start()

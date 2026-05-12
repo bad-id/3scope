@@ -3,6 +3,6 @@
 
 import { pyflowRuntime } from './pyflowRuntime.js';
 
-export * from './pynq/index.js';
+export * from './utils/index.js';
 
 export { pyflowRuntime };

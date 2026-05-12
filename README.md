@@ -24,7 +24,7 @@ pip freeze > requirements.txt
 
 To rebuild the frontend links:
 ```
-pyflow run -m ./ -g ../frontend/app/generated
+pyflow generate -m ./backend -o ./generated 
 ```
 
 
@@ -37,5 +37,12 @@ npm i
 ```
 
 ### Run project
+On Windows run 
+'''
+SET PYTHONUTF8=1
+'''
+'''
+pyflow run -m ./
+'''
 The camera should be connected by USB to the host PC.
 The PYNQ board is connected by ethernet, default connection is to 10.43.0.1:11008.

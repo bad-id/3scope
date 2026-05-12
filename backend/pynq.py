@@ -2,7 +2,10 @@ import pyvisa
 from math import floor
 import time # temporary
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8e2009bb174dc7cc0a6137f8bd17aa6b300b31a7
 class MotorCommandOutOfBounds(Exception):
     pass
 
