@@ -8,10 +8,11 @@ if __name__ == '__main__':
     if (camera.connect() and pynq.connect()):
         print(pynq.idn)
         pynq.initMot()
-        pynq.moveToZero()
 
-        pynq.moveRelativeSteps(10000)
-
+        #pynq.moveToZero()
+        #pynq.moveRelativeSteps(10000)
+        pynq.moveAbsoluteSteps(10000)
+        pynq.moveAbsoluteSteps(5000)
         print('Stopped')
     
     else:

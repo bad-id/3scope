@@ -57,7 +57,7 @@ class PYNQ(Device):
             
             self.idn = self.inst.query('*IDN?')
             self.connected = True
-            
+
         except (ConnectionResetError, pyvisa.errors.VisaIOError) as e:
             self.connected = False
 
@@ -237,3 +237,18 @@ class PYNQ(Device):
 
         if self.DEBUG:
             print('Stopped at end point')
+
+    def moveAbsoluteSteps(self, 
+                          position: int, 
+                          frequency: float = 4500):
+        '''
+        If calibrated, moves to absolute position
+        '''
+        assert position >= self.MOT_LIMITS[0]
+        assert position <= self.MOT_LIMITS[1]
+
+        if not self.mot_calibrated:
+            self.moveToZero()
+
+        steps: int = position - self.mot_absolute_steps
+        self.moveRelativeSteps(steps=steps, frequency=frequency)
