@@ -1,16 +1,16 @@
 import logoDark from "./logo-dark.svg";
 import logoLight from "./logo-light.svg";
-import { testFunctionStuff, getCameraInstance } from "generated";
+import { SystemManager } from "generated";
 import { useEffect, useState } from "react";
 
 
 export function Welcome() {
-
+  const [systemManager] = useState(() => new SystemManager());
 
   return (
     <main className="flex items-center justify-center pt-16 pb-4">
       <div className="flex-1 flex flex-col items-center gap-16 min-h-0">
-          <a> {testFunctionStuff()}</a>
+          <a> Static text </a>
 
       </div>
     </main>

@@ -2,6 +2,19 @@
 import { pyflowRuntime } from '../pyflowRuntime.js';
 
 
+export class Device {
+
+  constructor(data: Record<string, any> = {}) {
+    Object.assign(this, data);
+  }
+}
+
+export function createDevice(options: Partial<Device> = {}): Device {
+  return new Device(options as any);
+}
+
+
+
 export class Camera {
 
   constructor(data: Record<string, any> = {}) {
