@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from pypylon import pylon
+from pypylon import pylon, _genicam
 from pyflow import extensity
 from device import Device
 
@@ -12,18 +12,24 @@ class Camera(Device):
         self.camera = None
 
     def connect(self):
-        # Connect to camera
-        self.camera = pylon.InstantCamera(
-            pylon.TlFactory.GetInstance().CreateFirstDevice()
-        )
-        self.camera.Open()
+        try:
+            # Connect to camera
+            self.camera = pylon.InstantCamera(
+                pylon.TlFactory.GetInstance().CreateFirstDevice()
+            )
+            self.camera.Open()
 
-        # Converter setup
-        self.converter = pylon.ImageFormatConverter()
-        self.converter.OutputPixelFormat = pylon.PixelType_BGR8packed
-        self.converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
+            # Converter setup
+            self.converter = pylon.ImageFormatConverter()
+            self.converter.OutputPixelFormat = pylon.PixelType_BGR8packed
+            self.converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
 
-        self.connected = True
+            self.connected = True
+            return True
+        
+        except (_genicam.RuntimeException) as e:
+            self.connected = False
+            return False
 
     def start(self):
         self.camera.StartGrabbing(pylon.GrabStrategy_LatestImageOnly)

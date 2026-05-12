@@ -9,5 +9,5 @@ class Device(metaclass=ABCMeta):
     connected = False
 
     @abstractmethod
-    def connect(self):
+    def connect(self) -> bool: # returns true if successful connection
         ...
