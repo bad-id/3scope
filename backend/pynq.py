@@ -1,11 +1,12 @@
 import pyvisa
 from math import floor
 import time # temporary
+from device import Device
 
 class MotorCommandOutOfBounds(Exception):
     pass
 
-class PYNQ:
+class PYNQ(Device):
     defaultPulsePin = "RBPI07"
     defaultDirPin = "RBPI29"
     defaultEndSwitch1Pin = "RBPI27"
@@ -25,16 +26,22 @@ class PYNQ:
     MOT_LIMITS = [0, 57000] # 58265/58257 is the max range, for safety 57000 limit
 
     def __init__(self,
-                ip:str = "10.43.0.1", 
-                port:str = "11008",
                 DEBUG: bool = False):
-        self.ip = ip
-        self.port = port
+        self.device_name = 'PYNQ'
+
         self.DEBUG = DEBUG
         self.mot_calibrated = False # Is the absolute positon known
         self.mot_absolute_steps = 0 # Absolute number of steps from zero position
 
         self.rm = pyvisa.ResourceManager()
+        #self.inst.write('*RST')
+    
+    def connect(self,
+                ip:str = "10.43.0.1", 
+                port:str = "11008"):
+        self.ip = ip
+        self.port = port
+
         self.inst = self.rm.open_resource(f'TCPIP::{ip}::{port}::SOCKET',
                         open_timeout=10000)
         #print(self.rm.list_resources())
@@ -48,8 +55,7 @@ class PYNQ:
         self.inst.flush(pyvisa.constants.BufferOperation.discard_read_buffer)
         
         self.idn = self.inst.query('*IDN?')
-        #self.inst.write('*RST')
-    
+
     def query(self,
               command: str):
         if self.DEBUG:

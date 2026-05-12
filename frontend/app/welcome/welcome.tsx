@@ -1,12 +1,11 @@
 import logoDark from "./logo-dark.svg";
 import logoLight from "./logo-light.svg";
-import { Camera } from "generated/camera";
 import { testFunctionStuff, getCameraInstance } from "generated";
 import { useEffect, useState } from "react";
 
 
 export function Welcome() {
-  const camera = getCameraInstance();
+
 
   return (
     <main className="flex items-center justify-center pt-16 pb-4">
