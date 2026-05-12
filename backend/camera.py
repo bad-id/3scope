@@ -25,11 +25,10 @@ class Camera(Device):
             self.converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
 
             self.connected = True
-            return True
         
         except (_genicam.RuntimeException) as e:
             self.connected = False
-            return False
+        return self.connected
 
     def start(self):
         self.camera.StartGrabbing(pylon.GrabStrategy_LatestImageOnly)

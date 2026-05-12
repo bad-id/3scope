@@ -57,11 +57,11 @@ class PYNQ(Device):
             
             self.idn = self.inst.query('*IDN?')
             self.connected = True
-
-            return True
+            
         except (ConnectionResetError, pyvisa.errors.VisaIOError) as e:
             self.connected = False
-            return False
+
+        return self.connected
 
     def query(self,
               command: str):
