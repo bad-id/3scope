@@ -3,6 +3,7 @@
 
 import { pyflowRuntime } from './pyflowRuntime.js';
 
+export * from './camera/index.js';
 export * from './utils/index.js';
 
 export { pyflowRuntime };

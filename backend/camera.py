@@ -1,10 +1,14 @@
 import cv2
 import numpy as np
 from pypylon import pylon
+from pyflow import extensity
 
-
+@extensity
 class Camera:
     def __init__(self):
+        self.camera = None
+
+    def start(self):
         # Connect to camera
         self.camera = pylon.InstantCamera(
             pylon.TlFactory.GetInstance().CreateFirstDevice()
@@ -16,10 +20,10 @@ class Camera:
         self.converter.OutputPixelFormat = pylon.PixelType_BGR8packed
         self.converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
 
-    def start(self):
         self.camera.StartGrabbing(pylon.GrabStrategy_LatestImageOnly)
 
     def stop(self):
+        self.started = False
         self.camera.StopGrabbing()
         self.camera.Close()
         cv2.destroyAllWindows()
@@ -61,8 +65,3 @@ class Camera:
                 break
 
         self.stop()
-
-
-if __name__ == "__main__":
-    cam = Camera()
-    cam.run()
