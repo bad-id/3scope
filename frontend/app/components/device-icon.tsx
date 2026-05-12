@@ -1,5 +1,4 @@
-
-export default function DeviceIcon( { device } ) {
+export default function DeviceIcon() {
     return (
         <div>
             
