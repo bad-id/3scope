@@ -48,9 +48,14 @@ class Camera:
 
     def tenengrad(self, image):
         gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
         gx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3)
         gy = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3)
- 
+
+        g = np.sqrt(gx**2 + gy**2)
+
+        return np.mean(g)
+
     def run(self):
         self.start()
 
