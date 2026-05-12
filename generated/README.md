@@ -1,5 +1,16 @@
 # PyFlow.ts Project: codegen
 
+## Run
+In seperate terminals:
+'''
+npm run start-server
+'''
+'''
+npm run start-ts
+'''
+
+
+
 This project was automatically generated with PyFlow.ts.
 
 ## Getting Started
