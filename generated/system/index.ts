@@ -125,6 +125,27 @@ export class SystemManager {
     return result;
   }
 
+  async testReturn(): Promise<string> {
+    const result = await pyflowRuntime.callMethod(
+      'SystemManager',
+      'testReturn',
+      {},
+      {},
+      this
+    );
+    if (result && typeof result === 'object') {
+      // Handle instance ID if present
+      if (result.__instance_id__) {
+        this._instanceId = result.__instance_id__;
+        if (this._instanceId) {
+          pyflowRuntime.registerInstance(this, this._instanceId);
+        }
+        delete result.__instance_id__;
+      }
+    }
+    return result;
+  }
+
   static async createInstance(args: Partial<SystemManager> = {}): Promise<SystemManager> {
     const instance = new SystemManager(args);
     const instanceId = await pyflowRuntime.createInstance('SystemManager', args);

@@ -126,6 +126,27 @@ export class Camera {
     return result;
   }
 
+  async set_exposure(exposure_time_us: any): Promise<any> {
+    const result = await pyflowRuntime.callMethod(
+      'Camera',
+      'set_exposure',
+      {exposure_time_us: exposure_time_us},
+      {},
+      this
+    );
+    if (result && typeof result === 'object') {
+      // Handle instance ID if present
+      if (result.__instance_id__) {
+        this._instanceId = result.__instance_id__;
+        if (this._instanceId) {
+          pyflowRuntime.registerInstance(this, this._instanceId);
+        }
+        delete result.__instance_id__;
+      }
+    }
+    return result;
+  }
+
   async start(): Promise<any> {
     const result = await pyflowRuntime.callMethod(
       'Camera',

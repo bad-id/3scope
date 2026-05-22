@@ -1,6 +1,6 @@
 import logoDark from "./logo-dark.svg";
 import logoLight from "./logo-light.svg";
-import { Camera, SystemManager } from "generated";
+import { Camera } from "generated";
 import { useEffect, useState } from "react";
 import { useSystemContext } from "~/context";
 import { Devices } from "~/components/devices";
@@ -8,9 +8,11 @@ import { Devices } from "~/components/devices";
 export function Welcome() {
   const system = useSystemContext();
   
+  const [testReturn, setTestReturn] = useState([])
+
   const loadFrame = async () => {
     const camera = await system?.getCamera();
-    const frame = await camera?.get_frame()
+    const frame = await camera?.get_frame();
   }
 
   useEffect(() => {

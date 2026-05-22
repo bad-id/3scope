@@ -4,8 +4,8 @@ from pynq import PYNQ
 import numpy as np
 
 camera: Camera     = Camera()
-pynq:   PYNQ       = None
-image:  np.ndarray = None
+pynq:   PYNQ       = PYNQ()
+image:  np.ndarray = []
 
 @extensity
 class SystemManager:
@@ -23,4 +23,6 @@ class SystemManager:
         return pynq
     def getImage(self) -> np.ndarray:
         return image
+    def testReturn(self) -> str:
+        return "This is text"
     
