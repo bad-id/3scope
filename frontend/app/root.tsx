@@ -6,9 +6,12 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { useState } from "react";
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { SystemContext } from "./context";
+import { SystemManager } from "generated";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -24,6 +27,8 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+   const [system, setSystem] = useState<SystemManager>(new SystemManager());
+
   return (
     <html lang="en">
       <head>
@@ -33,7 +38,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <SystemContext.Provider value={system}>
+          {children}
+        </SystemContext.Provider>
         <ScrollRestoration />
         <Scripts />
       </body>

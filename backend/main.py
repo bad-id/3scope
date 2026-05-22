@@ -4,15 +4,16 @@ from camera import Camera
 
 if __name__ == '__main__':
     pynq = pynq.PYNQ(DEBUG=False)  
-    camera = Camera() 
+    camera = Camera()
+    if (camera.connect() and pynq.connect()):
+        print(pynq.idn)
+        pynq.initMot()
 
-    print(pynq.idn)
-    pynq.initMot()
-    pynq.moveToZero()
-
-    autofocus(
-        pynq,
-        camera,
-        110,
-        100, 50)
-    print('Stopped')
+        #pynq.moveToZero()
+        #pynq.moveRelativeSteps(10000)
+        pynq.moveAbsoluteSteps(10000)
+        pynq.moveAbsoluteSteps(5000)
+        print('Stopped')
+    
+    else:
+        print("Error connecting")

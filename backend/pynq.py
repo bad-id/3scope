@@ -1,6 +1,7 @@
 import pyvisa
 from math import floor
 import time # temporary
+from device import Device
 
 <<<<<<< HEAD
 
@@ -9,7 +10,7 @@ import time # temporary
 class MotorCommandOutOfBounds(Exception):
     pass
 
-class PYNQ:
+class PYNQ(Device):
     defaultPulsePin = "RBPI07"
     defaultDirPin = "RBPI29"
     defaultEndSwitch1Pin = "RBPI27"
@@ -29,31 +30,43 @@ class PYNQ:
     MOT_LIMITS = [0, 57000] # 58265/58257 is the max range, for safety 57000 limit
 
     def __init__(self,
-                ip:str = "10.43.0.1", 
-                port:str = "11008",
                 DEBUG: bool = False):
-        self.ip = ip
-        self.port = port
+        self.device_name = 'PYNQ'
+
         self.DEBUG = DEBUG
         self.mot_calibrated = False # Is the absolute positon known
         self.mot_absolute_steps = 0 # Absolute number of steps from zero position
 
         self.rm = pyvisa.ResourceManager()
-        self.inst = self.rm.open_resource(f'TCPIP::{ip}::{port}::SOCKET',
-                        open_timeout=10000)
-        #print(self.rm.list_resources())
-
-        self.inst.timeout = 2000
-        self.inst.write_termination = '\n'
-        self.inst.read_termination  = '\n'
-        self.inst.StopBits = 1
-        
-        self.inst.clear()
-        self.inst.flush(pyvisa.constants.BufferOperation.discard_read_buffer)
-        
-        self.idn = self.inst.query('*IDN?')
         #self.inst.write('*RST')
     
+    def connect(self,
+                ip:str = "10.43.0.1",
+                port:str = "11008"):
+        self.ip = ip
+        self.port = port
+
+        try:
+            self.inst = self.rm.open_resource(f'TCPIP::{ip}::{port}::SOCKET',
+                            open_timeout=10000)
+            #print(self.rm.list_resources())
+
+            self.inst.timeout = 2000
+            self.inst.write_termination = '\n'
+            self.inst.read_termination  = '\n'
+            self.inst.StopBits = 1
+            
+            self.inst.clear()
+            self.inst.flush(pyvisa.constants.BufferOperation.discard_read_buffer)
+            
+            self.idn = self.inst.query('*IDN?')
+            self.connected = True
+
+        except (ConnectionResetError, pyvisa.errors.VisaIOError) as e:
+            self.connected = False
+
+        return self.connected
+
     def query(self,
               command: str):
         if self.DEBUG:
@@ -231,3 +244,18 @@ class PYNQ:
 
         if self.DEBUG:
             print('Stopped at end point')
+
+    def moveAbsoluteSteps(self, 
+                          position: int, 
+                          frequency: float = 4500):
+        '''
+        If calibrated, moves to absolute position
+        '''
+        assert position >= self.MOT_LIMITS[0]
+        assert position <= self.MOT_LIMITS[1]
+
+        if not self.mot_calibrated:
+            self.moveToZero()
+
+        steps: int = position - self.mot_absolute_steps
+        self.moveRelativeSteps(steps=steps, frequency=frequency)

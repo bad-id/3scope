@@ -1,21 +1,27 @@
 import logoDark from "./logo-dark.svg";
 import logoLight from "./logo-light.svg";
-import { testFunctionStuff } from "generated";
-import { TestingClass } from "generated/utils"
+import { Camera, SystemManager } from "generated";
+import { useEffect, useState } from "react";
+import { useSystemContext } from "~/context";
 
-async function runCamera() {
-  const camera = new TestingClass();
-  console.log(await camera.returnstuff())
-  
-}
 
 export function Welcome() {
-  runCamera().catch(console.error);
+  const system = useSystemContext();
+  
+  const loadFrame = async () => {
+    const camera = await system?.getCamera();
+    const frame = await camera?.get_frame()
+  }
+
+  useEffect(() => {
+    loadFrame();
+  }
+  )
+
   return (
     <main className="flex items-center justify-center pt-16 pb-4">
       <div className="flex-1 flex flex-col items-center gap-16 min-h-0">
-          <a> {testFunctionStuff()}</a>
-
+          <a> Static text </a>
       </div>
     </main>
   );
