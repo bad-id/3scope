@@ -12,7 +12,7 @@ def autofocus(
     """
     This function automatically finds the best position for the lens to get a good image in the lens
     :param: wanted_sharpness
-    :use: sets a limit on when the focus is good enough to stop.
+    :use: sets a limit on when the focus is good enough to stop using the tenengrad sharpness scale.
     :param: number_steps
     :use: the number of steps you want the first step to be.
     :param: decrease_in_steps
@@ -27,7 +27,7 @@ def autofocus(
     camera.start()
     image = camera.get_frame()
     #get a sharpness value
-    focus_value = camera.check_sharpness(image)
+    focus_value = camera.tenengrad(image)
     focus_values_array = []
     focus_values_array.append(focus_value)
     i = 0
@@ -38,7 +38,7 @@ def autofocus(
             #get an image
             image = camera.get_frame()
             #get a sharpness value
-            focus_value = camera.check_sharpness(image)
+            focus_value = camera.tenengrad(image)
             focus_values_array.append(focus_value)
             i = i +1
         if i > 0:
@@ -48,7 +48,7 @@ def autofocus(
                 #get an image
                 image = camera.get_frame()
                 #get a sharpness value
-                focus_value = camera.check_sharpness(image)
+                focus_value = camera.tenengrad(image)
                 focus_values_array.append(focus_value)
                 i = i + 1
             elif focus_values_array[i] < focus_values_array[i-1]:
@@ -59,7 +59,7 @@ def autofocus(
                 #get an image
                 image = camera.get_frame()
                 #get a sharpness value
-                focus_value = camera.check_sharpness(image)
+                focus_value = camera.tenengrad(image)
                 focus_values_array.append(focus_value)
                 i = i + 1
     return camera.get_frame()
