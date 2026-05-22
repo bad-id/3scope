@@ -13,6 +13,10 @@ export function Welcome() {
     //const frame = await camera?.get_frame();
   }
 
+  function handleClick() {
+    system?.generateRandom()
+  }
+  
   useEffect(() => {
     loadFrame();
   }
@@ -23,6 +27,9 @@ export function Welcome() {
       <Devices/>
       <div className="flex-1 flex flex-col items-center gap-16 min-h-0">
           <a> Static text </a>
+          <button onClick={handleClick} className="bg-red-50">
+            Move to 5k
+          </button>
           <span className="whitespace-pre-line">
             {system?.getLogs()}
           </span>

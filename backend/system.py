@@ -4,6 +4,7 @@ from pynq import PYNQ
 import numpy as np
 import logging
 from io import StringIO
+import time
 
 camera: Camera     = Camera()
 pynq:   PYNQ       = PYNQ()
@@ -25,6 +26,7 @@ class SystemManager:
         
         if (camera.connect() and pynq.connect()):
             logging.info(f'PYNQ connected with idn: {pynq.idn}')
+            pynq.initMot()
 
     def getCamera(self) -> Camera:
         return camera
@@ -34,4 +36,5 @@ class SystemManager:
         return image
     def getLogs(self) -> str:
         return logStream.getvalue()
-    
+    def generateRandom(self) -> None:
+        pynq.moveAbsoluteSteps(5000)
