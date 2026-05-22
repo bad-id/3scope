@@ -2,6 +2,7 @@ import pyvisa
 from math import floor
 import time # temporary
 from device import Device
+import logging
 
 class MotorCommandOutOfBounds(Exception):
     pass
@@ -45,7 +46,7 @@ class PYNQ(Device):
         try:
             self.inst = self.rm.open_resource(f'TCPIP::{ip}::{port}::SOCKET',
                             open_timeout=10000)
-            #print(self.rm.list_resources())
+            #logging.info(self.rm.list_resources())
 
             self.inst.timeout = 2000
             self.inst.write_termination = '\n'
@@ -65,14 +66,12 @@ class PYNQ(Device):
 
     def query(self,
               command: str):
-        if self.DEBUG:
-            print(f'{command}')
+        logging.debug(f'{command}')
         return self.inst.query(command)
 
     def write(self, 
-              command: str):
-        if self.DEBUG:                
-            print(f'{command}')
+              command: str):         
+        logging.debug(f'{command}')
         self.inst.write(command)
 
     def writes(self,
@@ -99,8 +98,7 @@ class PYNQ(Device):
     def digiRead(self,
                   pin:str) -> bool:
         resp: str = self.query(f':GPIO:LEVEL? {pin}')
-        if self.DEBUG:
-            print(resp)
+        logging.debug(resp)
 
         if 'High' in resp:
             return True
@@ -227,8 +225,7 @@ class PYNQ(Device):
             self.mot_calibrated = True
             self.mot_absolute_steps = self.MOT_LIMITS[0]
 
-        if self.DEBUG:
-            print('Stopped at zero point')
+        logging.info('Motor stopped at zero point')
         return
     
     def moveToEnd(self,
@@ -238,8 +235,7 @@ class PYNQ(Device):
             self.moveRelativeSteps(steps)
         self.stopMoving()
 
-        if self.DEBUG:
-            print('Stopped at end point')
+        logging.info('Motor stopped at end point')
 
     def moveAbsoluteSteps(self, 
                           position: int, 

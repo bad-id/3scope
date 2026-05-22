@@ -2,10 +2,17 @@ from pyflow import extensity
 from camera import Camera
 from pynq import PYNQ
 import numpy as np
+import logging
+from io import StringIO
 
 camera: Camera     = Camera()
 pynq:   PYNQ       = PYNQ()
 image:  np.ndarray = []
+
+logStream: StringIO = StringIO()
+logHandler          = logging.StreamHandler(logStream)
+logging.getLogger().addHandler(logHandler)
+logging.getLogger().setLevel(logging.DEBUG)
 
 @extensity
 class SystemManager:
@@ -14,8 +21,10 @@ class SystemManager:
     '''
 
     def __init__(self):
-        if camera.connected == False:
-            camera.connect()
+        logging.debug('Init SystemManager')
+        
+        if (camera.connect() and pynq.connect()):
+            logging.info(f'PYNQ connected with idn: {pynq.idn}')
 
     def getCamera(self) -> Camera:
         return camera
@@ -23,6 +32,6 @@ class SystemManager:
         return pynq
     def getImage(self) -> np.ndarray:
         return image
-    def testReturn(self) -> str:
-        return "This is text"
+    def getLogs(self) -> str:
+        return logStream.getvalue()
     

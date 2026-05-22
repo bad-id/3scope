@@ -15,19 +15,6 @@ export function createDevice(options: Partial<Device> = {}): Device {
 
 
 
-export class Camera {
-
-  constructor(data: Record<string, any> = {}) {
-    Object.assign(this, data);
-  }
-}
-
-export function createCamera(options: Partial<Camera> = {}): Camera {
-  return new Camera(options as any);
-}
-
-
-
 export class PYNQ {
   DEBUG?: boolean;
 
@@ -39,6 +26,19 @@ export class PYNQ {
 
 export function createPYNQ(options: Partial<PYNQ> = {}): PYNQ {
   return new PYNQ(options as any);
+}
+
+
+
+export class Camera {
+
+  constructor(data: Record<string, any> = {}) {
+    Object.assign(this, data);
+  }
+}
+
+export function createCamera(options: Partial<Camera> = {}): Camera {
+  return new Camera(options as any);
 }
 
 
@@ -104,10 +104,10 @@ export class SystemManager {
     return result;
   }
 
-  async getPynq(): Promise<PYNQ> {
+  async getLogs(): Promise<string> {
     const result = await pyflowRuntime.callMethod(
       'SystemManager',
-      'getPynq',
+      'getLogs',
       {},
       {},
       this
@@ -125,10 +125,10 @@ export class SystemManager {
     return result;
   }
 
-  async testReturn(): Promise<string> {
+  async getPynq(): Promise<PYNQ> {
     const result = await pyflowRuntime.callMethod(
       'SystemManager',
-      'testReturn',
+      'getPynq',
       {},
       {},
       this
