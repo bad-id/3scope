@@ -11,8 +11,7 @@ if __name__ == '__main__':
 
         #pynq.moveToZero()
         #pynq.moveRelativeSteps(10000)
-        pynq.moveAbsoluteSteps(10000)
-        pynq.moveAbsoluteSteps(5000)
+        pynq.moveAbsoluteSteps(24950)
         print('Stopped')
     
     else:
