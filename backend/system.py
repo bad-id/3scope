@@ -6,6 +6,7 @@ import numpy as np
 camera: Camera     = Camera()
 pynq:   PYNQ       = PYNQ()
 image:  np.ndarray = []
+testText: str = "Default text"
 
 @extensity
 class SystemManager:
@@ -24,5 +25,5 @@ class SystemManager:
     def getImage(self) -> np.ndarray:
         return image
     def testReturn(self) -> str:
-        return "This is text"
+        return testText 
     

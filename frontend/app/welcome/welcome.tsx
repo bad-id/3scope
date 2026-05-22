@@ -7,12 +7,10 @@ import { Devices } from "~/components/devices";
 
 export function Welcome() {
   const system = useSystemContext();
-  
-  const [testReturn, setTestReturn] = useState([])
 
   const loadFrame = async () => {
-    const camera = await system?.getCamera();
-    const frame = await camera?.get_frame();
+    //const camera = await system?.getCamera();
+    //const frame = await camera?.get_frame();
   }
 
   useEffect(() => {
@@ -25,6 +23,7 @@ export function Welcome() {
       <Devices/>
       <div className="flex-1 flex flex-col items-center gap-16 min-h-0">
           <a> Static text </a>
+          {system?.testReturn()}
       </div>
     </main>
   );
