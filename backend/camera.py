@@ -3,6 +3,7 @@ import numpy as np
 from pypylon import pylon, _genicam
 from pyflow import extensity
 from device import Device
+import logging
 
 @extensity
 class Camera(Device):
@@ -89,7 +90,7 @@ class Camera(Device):
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 sharpness = self.check_sharpness(gray)
-                print(f"Sharpness: {sharpness:.2f}")
+                logging.info(f"Sharpness: {sharpness:.2f}")
                 break
 
         self.stop()
