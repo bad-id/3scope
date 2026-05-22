@@ -7,7 +7,8 @@ def autofocus(
         camera: Camera,
         wanted_sharpness: float,
         number_steps: int,
-        decrease_in_steps: int):
+        decrease_in_steps: int,
+        max_iterations: int):
     """
     This function automatically finds the best position for the lens to get a good image in the lens
     :param: wanted_sharpness
@@ -17,6 +18,8 @@ def autofocus(
     :param: decrease_in_steps
     :use: How much you want the steps to decrease when the focus values start dropping.
     The new amount of steps is given by previous number of steps divided by the decrease in steps.
+    :param: max_iterations
+    :use: sets a limit on how many times the moter can turn around and decrease in steps.
     """
     #initialise frequentie and direction
     direction = 1
@@ -27,9 +30,9 @@ def autofocus(
     focus_value = camera.check_sharpness(image)
     focus_values_array = []
     focus_values_array.append(focus_value)
-    i = 1
-    while focus_value < wanted_sharpness:
-        if i == 1:
+    i = 0
+    while focus_value < wanted_sharpness and i < max_iterations:
+        if i == 0:
             #Make the motor move
             pynq.moveRelativeSteps(direction*number_steps)
             #get an image
@@ -38,7 +41,7 @@ def autofocus(
             focus_value = camera.check_sharpness(image)
             focus_values_array.append(focus_value)
             i = i +1
-        if i > 1:
+        if i > 0:
             if focus_values_array[i] > focus_values_array[i-1]:
                 #Make the motor move
                 pynq.moveRelativeSteps(direction*number_steps)
@@ -48,12 +51,9 @@ def autofocus(
                 focus_value = camera.check_sharpness(image)
                 focus_values_array.append(focus_value)
                 i = i + 1
-            if focus_values_array[i] < focus_values_array[i-1]:
-                if direction == -1:
-                    direction = 1
-                if direction == 1:
-                    direction = -1
-                number_steps = number_steps/decrease_in_steps
+            elif focus_values_array[i] < focus_values_array[i-1]:
+                direction *=-1
+                number_steps = int(number_steps/decrease_in_steps)
                 #Make the motor move
                 pynq.moveRelativeSteps(direction*number_steps)
                 #get an image
