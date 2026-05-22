@@ -23,7 +23,7 @@ export function Welcome() {
       <Devices/>
       <div className="flex-1 flex flex-col items-center gap-16 min-h-0">
           <a> Static text </a>
-          {system?.testReturn()}
+          {system?.getLogs()}
       </div>
     </main>
   );

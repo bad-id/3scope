@@ -1328,6 +1328,65 @@ async def _systemmanager_getimage_endpoint(
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error calling method: {str(e)}")
 
+@app.post("/api/methods/system/systemmanager/getlogs")
+async def _systemmanager_getlogs_endpoint(
+    request: Dict[str, Any] = Body(...),
+    instance_id: Optional[str] = None
+):
+    """Call SystemManager.getLogs."""
+    try:
+        debug_log(f"Calling explicit method endpoint: SystemManager.getLogs")
+
+        # If instance_id is provided as a query parameter, use it
+        # Otherwise check if it's in the request body
+        if not instance_id and "instance_id" in request:
+            instance_id = request.pop("instance_id")
+
+        # Process based on whether we have an instance_id
+        if instance_id:
+            # Use existing instance from cache
+            if instance_id not in instance_cache:
+                raise HTTPException(status_code=404, detail=f"No instance found with ID {instance_id}")
+
+            instance = instance_cache[instance_id]["instance"]
+            debug_log(f"Using existing instance with ID: {instance_id}")
+        else:
+            # Create a new instance
+            debug_log(f"Creating new SystemManager instance")
+            constructor_args = request.pop("constructor_args", {})
+
+            try:
+                # Import module and create instance
+                module = importlib.import_module("system")
+                cls = getattr(module, "SystemManager")
+                instance = cls(**constructor_args)
+
+                # Store for future use
+                instance_id = str(uuid.uuid4())
+                instance_cache[instance_id] = {
+                    'instance': instance,
+                    'class_name': "SystemManager"
+                }
+                debug_log(f"Created instance with ID: {instance_id}")
+            except Exception as e:
+                debug_log(f"Error creating instance: {str(e)}")
+                raise HTTPException(status_code=400, detail=f"Error creating instance: {str(e)}")
+
+        # Call the method with the arguments
+        method = getattr(instance, "getLogs")
+        debug_log(f"Calling method with args: {json.dumps(request, default=str)}")
+        result = method(**request)
+        debug_log(f"Method returned result type: {type(result).__name__}")
+
+        # Return the result with instance_id for future reference
+        return {"result": result, "instance_id": instance_id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        debug_log(f"Error in systemmanager_getlogs_endpoint: {str(e)}")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error calling method: {str(e)}")
+
 @app.post("/api/methods/system/systemmanager/getpynq")
 async def _systemmanager_getpynq_endpoint(
     request: Dict[str, Any] = Body(...),
@@ -1384,65 +1443,6 @@ async def _systemmanager_getpynq_endpoint(
         raise
     except Exception as e:
         debug_log(f"Error in systemmanager_getpynq_endpoint: {str(e)}")
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Error calling method: {str(e)}")
-
-@app.post("/api/methods/system/systemmanager/testreturn")
-async def _systemmanager_testreturn_endpoint(
-    request: Dict[str, Any] = Body(...),
-    instance_id: Optional[str] = None
-):
-    """Call SystemManager.testReturn."""
-    try:
-        debug_log(f"Calling explicit method endpoint: SystemManager.testReturn")
-
-        # If instance_id is provided as a query parameter, use it
-        # Otherwise check if it's in the request body
-        if not instance_id and "instance_id" in request:
-            instance_id = request.pop("instance_id")
-
-        # Process based on whether we have an instance_id
-        if instance_id:
-            # Use existing instance from cache
-            if instance_id not in instance_cache:
-                raise HTTPException(status_code=404, detail=f"No instance found with ID {instance_id}")
-
-            instance = instance_cache[instance_id]["instance"]
-            debug_log(f"Using existing instance with ID: {instance_id}")
-        else:
-            # Create a new instance
-            debug_log(f"Creating new SystemManager instance")
-            constructor_args = request.pop("constructor_args", {})
-
-            try:
-                # Import module and create instance
-                module = importlib.import_module("system")
-                cls = getattr(module, "SystemManager")
-                instance = cls(**constructor_args)
-
-                # Store for future use
-                instance_id = str(uuid.uuid4())
-                instance_cache[instance_id] = {
-                    'instance': instance,
-                    'class_name': "SystemManager"
-                }
-                debug_log(f"Created instance with ID: {instance_id}")
-            except Exception as e:
-                debug_log(f"Error creating instance: {str(e)}")
-                raise HTTPException(status_code=400, detail=f"Error creating instance: {str(e)}")
-
-        # Call the method with the arguments
-        method = getattr(instance, "testReturn")
-        debug_log(f"Calling method with args: {json.dumps(request, default=str)}")
-        result = method(**request)
-        debug_log(f"Method returned result type: {type(result).__name__}")
-
-        # Return the result with instance_id for future reference
-        return {"result": result, "instance_id": instance_id}
-    except HTTPException:
-        raise
-    except Exception as e:
-        debug_log(f"Error in systemmanager_testreturn_endpoint: {str(e)}")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error calling method: {str(e)}")
 
