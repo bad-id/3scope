@@ -23,9 +23,8 @@ class SystemManager:
     def __init__(self):
         logging.debug('Init SystemManager')
         
-        if camera.connected == False:
-            camera.connect()
-        print(f'Logs: ')
+        if (camera.connect() and pynq.connect()):
+            logging.info(f'PYNQ connected with idn: {pynq.idn}')
 
     def getCamera(self) -> Camera:
         return camera

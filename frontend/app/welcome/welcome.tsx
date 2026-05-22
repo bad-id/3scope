@@ -23,7 +23,9 @@ export function Welcome() {
       <Devices/>
       <div className="flex-1 flex flex-col items-center gap-16 min-h-0">
           <a> Static text </a>
-          {system?.getLogs()}
+          <span className="whitespace-pre-line">
+            {system?.getLogs()}
+          </span>
       </div>
     </main>
   );
