@@ -23,3 +23,4 @@ class SystemManager:
         return pynq
     def getImage(self) -> np.ndarray:
         return image
+    

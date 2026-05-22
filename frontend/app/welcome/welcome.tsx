@@ -3,7 +3,7 @@ import logoLight from "./logo-light.svg";
 import { Camera, SystemManager } from "generated";
 import { useEffect, useState } from "react";
 import { useSystemContext } from "~/context";
-
+import { Devices } from "~/components/devices";
 
 export function Welcome() {
   const system = useSystemContext();
@@ -20,6 +20,7 @@ export function Welcome() {
 
   return (
     <main className="flex items-center justify-center pt-16 pb-4">
+      <Devices/>
       <div className="flex-1 flex flex-col items-center gap-16 min-h-0">
           <a> Static text </a>
       </div>

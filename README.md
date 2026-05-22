@@ -42,7 +42,7 @@ On Windows run
 SET PYTHONUTF8=1
 '''
 '''
-pyflow run -m ./
+pyflow run -m ./backend/
 '''
 The camera should be connected by USB to the host PC.
 The PYNQ board is connected by ethernet, default connection is to 10.43.0.1:11008.

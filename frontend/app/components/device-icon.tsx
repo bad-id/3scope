@@ -1,7 +1,7 @@
-export default function DeviceIcon() {
+export default function DeviceIcon( {device} ) {
     return (
         <div>
-            
+            {device?.device_name}
         </div>
     )
 }
