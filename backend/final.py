@@ -15,7 +15,7 @@ def final_code(iterations):
     camera = Camera()
     camera.connect()
     camera.start()
-    pynq = pynq.PYNQ(DEBUG=False)
+    pynq = PYNQ(DEBUG=False)
     pynq.connect()
     pynq.initMot()
     exposure_time = 5000
@@ -26,10 +26,11 @@ def final_code(iterations):
     zoomed_steps = 5
     steps_small = steps / relative_size
     sharpness_data = np.zeros(iterations)
-    zoomed_data = np.zeros(total_small_iterations)
-    total_small_iterations = 2 * zoomed_steps * relative_size 
     
-
+    total_small_iterations = 2 * zoomed_steps * relative_size 
+    zoomed_data = np.zeros(total_small_iterations)
+    
+    pynq.moveToZero()
     for i in range(0, iterations):
         frame = camera.get_frame()
 
@@ -48,9 +49,9 @@ def final_code(iterations):
     max_index = np.argmax(sharpness_data)
     max_steps = max_index * steps
 
-    pynq.moveToZero()
-    pynq.moveRelativeSteps(max_steps)
-    pynq.moveRelativeSteps((-1/2 * total_small_iterations) * steps_small)
+    best_rough_point = (-1/2 * total_small_iterations) * steps_small
+    # Finish rough stage, move to the sharpness point
+    pynq.moveAbsoluteSteps(best_rough_point)
 
     for i in range(0, total_small_iterations):
         frame = camera.get_frame()
@@ -68,11 +69,12 @@ def final_code(iterations):
         pynq.moveRelativeSteps(steps_small)
 
     max_sharpness_index = np.argmax(zoomed_data)
-    pynq.moveRelativeSteps(-total_small_iterations * steps_small)
-    pynq.moveRelativeSteps(max_sharpness_index * steps_small)
+    # Move to the best sharpness point
+    pynq.moveAbsoluteSteps(best_rough_point + max_sharpness_index*steps_small)
 
     camera.run()
 
-    
+if __name__ == '__main__':
+     final_code(200)  
 
 
