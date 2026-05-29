@@ -66,6 +66,7 @@ def final_code(iterations):
         gray = camera.gaussian_blur(frame)
         sharpness = camera.tenengrad(gray)
         zoomed_data[i] = sharpness
+        print(sharpness)
 
         pynq.moveRelativeSteps(steps_small)
 
