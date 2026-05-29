@@ -19,11 +19,11 @@ if __name__ == '__main__':
     pynq = pynq.PYNQ(DEBUG=False)
     pynq.connect()
     pynq.initMot()
-    exposure_time = 5000
+    exposure_time = 5e3
     camera.set_exposure(exposure_time)
 
     # Measurement settings
-    total_measurements = 200
+    total_measurements = 50
     steps_per_measurement = (pynq.MOT_LIMITS[1] - 5000) / total_measurements
 
     # Initialize arrays

@@ -112,7 +112,7 @@ class PYNQ(Device):
         '''
         Write to digital pin
         '''
-        statestring = self.STATES[state]
+        statestring = self.STATES[int(state)]
         self.write(f':GPIO:LEVEL {pin}, {statestring}')
 
     def endSwitchPushed1(self): # Needs to be inverse
