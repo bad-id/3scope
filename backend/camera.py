@@ -57,8 +57,8 @@ class Camera(Device):
         grabResult.Release()
         return None
 
-    def gaussian_blur(self, image):
-        blurred_image = cv2.GaussianBlur(image, (3,3), 0)
+    def gaussian_blur(self, image, blur=(3,3)):
+        blurred_image = cv2.GaussianBlur(image, blur, 0)
         return blurred_image
 
     def check_sharpness(self, image):

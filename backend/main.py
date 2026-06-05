@@ -13,6 +13,9 @@ from matplotlib.animation import FuncAnimation
 iterations = 40
 exposure_time = 3e3
 step_size = 1e3
+blur = 51
+
+blur_matrix = (blur,blur)
 
 if __name__ == '__main__':
     pynq = pynq.PYNQ(DEBUG=False)  
@@ -46,7 +49,7 @@ if __name__ == '__main__':
         frame = camera.get_frame()
         positions.append(pynq.mot_absolute_steps)
 
-        gray = camera.gaussian_blur(frame)
+        gray = camera.gaussian_blur(frame, blur=blur_matrix)
         sharp = camera.tenengrad(gray)
         sharpness.append(sharp)
 
@@ -64,7 +67,7 @@ if __name__ == '__main__':
             
             positions.append(pynq.mot_absolute_steps)
 
-            gray = camera.gaussian_blur(frame)
+            gray = camera.gaussian_blur(frame, blur=blur_matrix)
             sharp = camera.tenengrad(gray)
             sharpness.append(sharp)
             line1.set_data(positions, sharpness)
@@ -77,10 +80,6 @@ if __name__ == '__main__':
 
         anim = FuncAnimation(fig, animate, init_func = init,
                             frames = iterations, interval = 0, repeat=False)
-
-
-        #plt.show()
-        logging.info(sharpness[-1])
         
         try:
             plt.show()
