@@ -19,7 +19,7 @@ if __name__ == '__main__':
     pynq = pynq.PYNQ(DEBUG=False)
     pynq.connect()
     pynq.initMot()
-    exposure_time = 5e3
+    exposure_time = 20e3
     camera.set_exposure(exposure_time)
 
     # Measurement settings
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     tenengrad_list = np.zeros(total_measurements)
     tenengrad_and_gaussianblur_list = np.zeros(total_measurements)
 
-    pynq.moveToZero()   
+    pynq.moveToZero()  
 
     # Perform measurement
     for i in range(0, total_measurements):
