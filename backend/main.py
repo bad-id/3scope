@@ -4,7 +4,7 @@ from camera import Camera
 import logging
 import numpy as np
 import matplotlib.pyplot as plt
-import time
+from matplotlib.animation import FuncAnimation
 
 
 if __name__ == '__main__':
