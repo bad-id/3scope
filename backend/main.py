@@ -6,6 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
+iterations = 20
+exposure_time = 3e3
 
 if __name__ == '__main__':
     pynq = pynq.PYNQ(DEBUG=False)  
@@ -15,7 +17,6 @@ if __name__ == '__main__':
         pynq.initMot()
 
         camera.start()
-        exposure_time = 3e3
         camera.set_exposure(exposure_time)
 
         #plt.ion()
@@ -31,7 +32,7 @@ if __name__ == '__main__':
         ax1.set_xlabel("Amount of steps")
         ax1.set_ylabel("Tenengrad rating with blur")
         ax1.set_title("Amount of steps against Tenengrad with blur")
-        li, = ax1.plot(positions, sharpness, 'x', color = 'g')
+        line1, = ax1.plot([], [], 'x', color = 'g')
 
         ax2.set_title("Image")
         ax2.set_axis_off()
@@ -44,36 +45,47 @@ if __name__ == '__main__':
         sharp = camera.tenengrad(gray)
         sharpness.append(sharp)
 
+        im = ax2.imshow(frame)
+
+        def init(): 
+            line1.set_data(positions, sharpness)
+            im.set_data(frame)
+            return line1,
+        
         step_size = 1e3
-        for i in range(30):
+        def animate(i): 
             pynq.moveRelativeSteps(step_size)
 
             frame = camera.get_frame()
-            ax2.imshow(frame)
+            
             positions.append(pynq.mot_absolute_steps)
 
             gray = camera.gaussian_blur(frame)
             sharp = camera.tenengrad(gray)
             sharpness.append(sharp)
+            line1.set_data(positions, sharpness)
+
+            ax1.set_xlim(positions[0], positions[-1])
+            ax1.set_ylim(np.min(sharpness), np.max(sharpness))
             
-            li.set_xdata(positions)
-            li.set_ydata(sharpness)
+            im.set_array(frame)
+            return line1, im
 
-            ax1.relim() 
-            ax1.autoscale_view(True,True,True) 
+        anim = FuncAnimation(fig, animate, init_func = init,
+                            frames = iterations, interval = 0, repeat=False)
 
-            fig.canvas.draw()
-            
-            plt.pause(0.0001)
-            #logging.info(sharpness, positions)
 
+        #plt.show()
         logging.info(sharpness[-1])
         
+        try:
+            plt.show()
+            logging.info('Closed plot')
+        except KeyboardInterrupt:
+            logging.error('Stopped by keyboard')
         pynq.moveToZero()
-        print('Stopped')
 
         #plt.ioff()
-        plt.show()
     
     else:
         logging.error("Error connecting")
