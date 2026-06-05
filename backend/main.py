@@ -13,7 +13,7 @@ if __name__ == '__main__':
         pynq.initMot()
 
         camera.start()
-        exposure_time = 5000
+        exposure_time = 7e3
         camera.set_exposure(exposure_time)
 
         plt.ion()
@@ -21,39 +21,36 @@ if __name__ == '__main__':
         sharpness = []
 
         fig, ax = plt.subplots()
-        line,  = ax.plot(positions, sharpness, 'x')
+        ax.set_xlabel("Amount of steps")
+        ax.set_ylabel("Tenengrad rating with blur")
+        ax.set_title("Amount of steps against Tenengrad with blur")
+        graph = ax.plot(positions, sharpness, 'x', color = 'g')[0]
 
         pynq.moveToZero()
         frame = camera.get_frame()
         positions.append(pynq.mot_absolute_steps)
-        sharpness.append(camera.check_sharpness(frame))
 
-        line.set_xdata(positions)
-        line.set_ydata(sharpness)
-        ax.relim()
-        ax.autoscale_view()
-        plt.draw()
+        gray = camera.gaussian_blur(frame)
+        sharp = camera.tenengrad(gray)
+        sharpness.append(sharp)
 
-        slope = 0.1
-        step_size = 50e3
-        while abs(slope*step_size) >= 1:
-            pynq.moveRelativeSteps(int(slope*step_size))
+        step_size = 1e3
+        for i in range(20):
+            pynq.moveRelativeSteps(step_size)
 
             frame = camera.get_frame()
             positions.append(pynq.mot_absolute_steps)
-            sharpness.append(camera.check_sharpness(frame))
 
-            line.set_xdata(positions)
-            line.set_ydata(sharpness)
-            ax.relim()
-            ax.autoscale_view()
-            plt.draw()
+            gray = camera.gaussian_blur(frame)
+            sharp = camera.tenengrad(gray)
+            sharpness.append(sharp)
+
+            graph.remove()
+            graph = ax.plot(positions, sharpness, 'x', color = 'g')[0]
+            plt.pause(0.0001)
             #logging.info(sharpness, positions)
 
-            slope = (sharpness[-1]-sharpness[-2])/(positions[-1]-positions[-2])
-            logging.info(slope)
         logging.info(sharpness[-1])
-
         
         print('Stopped')
 

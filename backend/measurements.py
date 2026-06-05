@@ -19,7 +19,7 @@ if __name__ == '__main__':
     pynq = pynq.PYNQ(DEBUG=False)
     pynq.connect()
     pynq.initMot()
-    exposure_time = 20e3
+    exposure_time = 3e3
     camera.set_exposure(exposure_time)
 
     # Measurement settings
