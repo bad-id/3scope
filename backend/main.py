@@ -1,3 +1,7 @@
+'''
+Displays live plot of camera and sharpness parameter
+'''
+
 import pynq
 from autofocus import autofocus
 from camera import Camera
@@ -6,8 +10,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-iterations = 20
+iterations = 40
 exposure_time = 3e3
+step_size = 1e3
 
 if __name__ == '__main__':
     pynq = pynq.PYNQ(DEBUG=False)  
@@ -52,7 +57,6 @@ if __name__ == '__main__':
             im.set_data(frame)
             return line1,
         
-        step_size = 1e3
         def animate(i): 
             pynq.moveRelativeSteps(step_size)
 
