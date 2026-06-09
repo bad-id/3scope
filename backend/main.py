@@ -1,5 +1,5 @@
 '''
-Displays live plot of camera and sharpness parameter
+Displays live plot of camera and sharpness parameter, tries fitting a gauss curve
 '''
 
 import pynq
@@ -7,6 +7,8 @@ from autofocus import autofocus
 from camera import Camera
 import logging
 import numpy as np
+import pandas as pd
+import os
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from scipy.optimize import curve_fit
@@ -14,10 +16,15 @@ from sklearn.metrics import r2_score
 
 iterations = 80
 start_point = 0#10e3
-exposure_time = 3e3
+exposure_time = 2e3
 step_size = 0.5e3
 blur = 101 # Must be odd number
 
+# Folder structure: ../data/setup[setup number per journal]/YYYY_MM_DD/[slide offset]/[nr. of measurement]
+base_folder = '../data/setup4/2026_06_09/plus0mm'
+
+folder = ''
+popt, pcov = [0, 0, 0], []
 blur_matrix = (blur,blur)
 
 
@@ -28,6 +35,20 @@ def gauss(x, a, b, c):
     return a*np.exp(- ((x-b)**2)/(2*(c**2)))
 
 if __name__ == '__main__':
+    # Initialize folder structure
+    if not os.path.exists(base_folder):
+        os.makedirs(base_folder)
+
+    nr_of_measurement = 1
+    subfolders = [ f.name for f in os.scandir(base_folder) if f.is_dir() ]
+    if len(subfolders) > 0:
+        nr_of_measurement = int(subfolders[-1]) +1 # Increment folder name by one
+
+    folder = os.path.join(base_folder, str(nr_of_measurement))
+    os.mkdir(folder)
+    exit()
+
+    # Initialize the PYNQ board and camera
     pynq = pynq.PYNQ(DEBUG=False)  
     camera = Camera()
     if (camera.connect() and pynq.connect()):
