@@ -27,6 +27,11 @@ folder = ''
 popt, pcov = [0, 0, 0], []
 blur_matrix = (blur,blur)
 
+def cc(filename: str) -> str:
+    '''
+    Shorthand concat filename
+    '''
+    return os.path.join(folder, filename)
 
 def gauss(x, a, b, c):
     '''
@@ -46,6 +51,12 @@ if __name__ == '__main__':
 
     folder = os.path.join(base_folder, str(nr_of_measurement))
     os.mkdir(folder)
+
+    # Init logging
+    infofile          = logging.FileHandler(cc('info.log'))
+    logging.getLogger().addHandler(infofile)
+    logging.getLogger().setLevel(logging.INFO)
+    logging.info(f'Files will be save in {folder}')
 
     # Initialize the PYNQ board and camera
     pynq = pynq.PYNQ(DEBUG=False)  
@@ -137,9 +148,12 @@ if __name__ == '__main__':
             logging.info('Closed plot')
         except KeyboardInterrupt:
             logging.error('Stopped by keyboard')
-        pynq.moveToZero()
 
-        #plt.ioff()
+        # Save data and reset
+        logging.info('Saving data')
+        fig.savefig(cc('tenegrad_vs_steps.png'))
+        
+        pynq.moveToZero()
     
     else:
         logging.error("Error connecting")
