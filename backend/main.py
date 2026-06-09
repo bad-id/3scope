@@ -46,7 +46,6 @@ if __name__ == '__main__':
 
     folder = os.path.join(base_folder, str(nr_of_measurement))
     os.mkdir(folder)
-    exit()
 
     # Initialize the PYNQ board and camera
     pynq = pynq.PYNQ(DEBUG=False)  
