@@ -15,10 +15,10 @@ from scipy.optimize import curve_fit
 from PIL import Image
 from sklearn.metrics import r2_score
 
-iterations = 400
+iterations = 1600
 start_point = 0#10e3
 exposure_time = 2e3
-step_size = 0.1e3
+step_size = 0.025e3
 blur = 101 # Must be odd number
 
 # Folder structure: ../data/setup[setup number per journal]/YYYY_MM_DD/[slide offset]/[nr. of measurement]
