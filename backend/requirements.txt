@@ -13,8 +13,10 @@ fonttools==4.62.1
 h11==0.16.0
 idna==3.13
 ifaddr==0.2.0
+joblib==1.5.3
 kiwisolver==1.5.0
 matplotlib==3.10.9
+narwhals==2.22.1
 numpy==2.4.4
 opencv-python==4.13.0.92
 packaging==26.1
@@ -29,9 +31,11 @@ python-dateutil==2.9.0.post0
 PyVISA==1.16.2
 PyVISA-py==0.8.1
 requests==2.33.1
+scikit-learn==1.9.0
 scipy==1.17.1
 six==1.17.0
 starlette==1.0.0
+threadpoolctl==3.6.0
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 urllib3==2.6.3
