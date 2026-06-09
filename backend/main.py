@@ -12,16 +12,18 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from scipy.optimize import curve_fit
+from PIL import Image
 from sklearn.metrics import r2_score
 
-iterations = 80
+iterations = 400
 start_point = 0#10e3
 exposure_time = 2e3
-step_size = 0.5e3
+step_size = 0.1e3
 blur = 101 # Must be odd number
 
 # Folder structure: ../data/setup[setup number per journal]/YYYY_MM_DD/[slide offset]/[nr. of measurement]
 base_folder = '../data/setup4/2026_06_09/plus0mm'
+save_img = True
 
 folder = ''
 popt, pcov = [0, 0, 0], []
@@ -51,6 +53,7 @@ if __name__ == '__main__':
 
     folder = os.path.join(base_folder, str(nr_of_measurement))
     os.mkdir(folder)
+    os.mkdir(cc('img'))
 
     # Init logging
     infofile          = logging.FileHandler(cc('info.log'))
@@ -108,6 +111,8 @@ if __name__ == '__main__':
             pynq.moveRelativeSteps(step_size)
 
             frame = camera.get_frame()
+            if save_img:
+                Image.fromarray(frame).save(cc(f'img/{str(i)}.jpg'))
             
             positions.append(pynq.mot_absolute_steps)
 
@@ -152,6 +157,10 @@ if __name__ == '__main__':
         # Save data and reset
         logging.info('Saving data')
         fig.savefig(cc('tenegrad_vs_steps.png'))
+
+        df = pd.DataFrame({ 'Position, steps' : positions,
+                            'Sharpness, -'    : sharpness})
+        df.to_csv(cc('sharpness.csv'))
         
         pynq.moveToZero()
     
