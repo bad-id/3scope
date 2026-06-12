@@ -21,7 +21,7 @@ start_point = 0#10e3
 exposure_time = 1e3
 step_size = 500
 blur = 101 # Must be odd number
-algo = 'increment'
+algo = 'hillClimbing'
 
 # Folder structure: ../data/setup[setup number per journal]/YYYY_MM_DD/[slide offset]/[nr. of measurement]
 base_folder = '../data/trash'#'../data/setup4/2026_06_12/plus0mm'
@@ -51,9 +51,9 @@ if __name__ == '__main__':
         os.makedirs(base_folder)
 
     nr_of_measurement = 1
-    subfolders = [ f.name for f in os.scandir(base_folder) if f.is_dir() ]
+    subfolders = [ int(f.name) for f in os.scandir(base_folder) if f.is_dir() ]
     if len(subfolders) > 0:
-        nr_of_measurement = int(subfolders[-1]) +1 # Increment folder name by one
+        nr_of_measurement = max(subfolders) +1 # Increment folder name by one
 
     folder = os.path.join(base_folder, str(nr_of_measurement))
     os.mkdir(folder)

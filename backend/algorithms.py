@@ -47,9 +47,9 @@ class Algorithms:
             if len(self.positions) == 0 or len(self.positions)== 1:
                 return self.pynq.mot_absolute_steps + self.hill_climb_increment
             else: 
-                if self.sharpness[len(self.sharpness)] > self.sharpness[len(self.sharpness)- 1]:
+                if self.sharpness[-1] > self.sharpness[-2]:
                     return self.pynq.mot_absolute_steps + self.hill_climb_increment
-                elif self.sharpness[len(self.sharpness)] < self.sharpness[len(self.sharpness) - 1]:
+                elif self.sharpness[-1] < self.sharpness[-2]:
                     self.hill_climb_increment = int(self.hill_climb_increment/self.decrease_in_steps)
                     return self.pynq.mot_absolute_steps + self.hill_climb_increment
         else: return -1
