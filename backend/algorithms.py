@@ -44,12 +44,12 @@ class Algorithms:
     def hillClimbing(self):
         
         if self.hill_climb_increment > self.smallest_steps:
-            if self.positions.size == 0 or self.positions.size == 1:
+            if len(self.positions) == 0 or len(self.positions)== 1:
                 return self.pynq.mot_absolute_steps + self.hill_climb_increment
             else: 
-                if self.sharpness[self.sharpness.size] > self.sharpness[self.sharpness.size - 1]:
+                if self.sharpness[len(self.sharpness)] > self.sharpness[len(self.sharpness)- 1]:
                     return self.pynq.mot_absolute_steps + self.hill_climb_increment
-                elif self.sharpness[self.sharpness.size] < self.sharpness[self.sharpness.size - 1]:
+                elif self.sharpness[len(self.sharpness)] < self.sharpness[len(self.sharpness) - 1]:
                     self.hill_climb_increment = int(self.hill_climb_increment/self.decrease_in_steps)
                     return self.pynq.mot_absolute_steps + self.hill_climb_increment
         else: return -1
