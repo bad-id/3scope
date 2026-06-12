@@ -12,6 +12,9 @@ import matplotlib.pyplot as plt
 
 
 if __name__ == '__main__':
+    """
+    This program only initializes the camera so we can use it to setup our system.
+    """
     camera = Camera()
     camera.connect()
     pynq = pynq.PYNQ(DEBUG=False)
