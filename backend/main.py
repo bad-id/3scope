@@ -5,6 +5,7 @@ Displays live plot of camera and sharpness parameter, tries fitting a gauss curv
 import pynq
 from autofocus import autofocus
 from camera import Camera
+from algorithms import Algorithms
 import logging
 import numpy as np
 import pandas as pd
@@ -17,17 +18,20 @@ from sklearn.metrics import r2_score
 
 iterations = 100
 start_point = 0#10e3
-exposure_time = 2e3
+exposure_time = 1e3
 step_size = 500
 blur = 101 # Must be odd number
+algo = 'increment'
 
 # Folder structure: ../data/setup[setup number per journal]/YYYY_MM_DD/[slide offset]/[nr. of measurement]
-base_folder = '../data/setup4/2026_06_12/plus0mm'
+base_folder = '../data/trash'#'../data/setup4/2026_06_12/plus0mm'
 save_img = True
 
 folder = ''
 popt, pcov = [0, 0, 0], []
 blur_matrix = (blur,blur)
+
+anim = None
 
 def cc(filename: str) -> str:
     '''
@@ -62,18 +66,21 @@ if __name__ == '__main__':
     logging.info(f'Files will be save in {folder}')
 
     # Initialize the PYNQ board and camera
+    positions = []
+    sharpness = []
+
     pynq = pynq.PYNQ(DEBUG=False)  
     camera = Camera()
+
+    algorithms = Algorithms(pynq=pynq,
+                            positions=positions,
+                            sharpness=sharpness)
     if (camera.connect() and pynq.connect()):
         logging.info(pynq.idn)
         pynq.initMot()
 
         camera.start()
         camera.set_exposure(exposure_time)
-
-        #plt.ion()
-        positions = []
-        sharpness = []
 
         fig, (ax1, ax2) = plt.subplots(1,2)
         fig.set_figwidth(16)
@@ -108,9 +115,10 @@ if __name__ == '__main__':
             return line1, fit_line, im
         
         def animate(i): 
-            pynq.moveRelativeSteps(step_size)
-            #new_pos = 
-            #pynq.moveAbsoluteSteps()
+            #pynq.moveRelativeSteps(step_size)
+            new_pos = algorithms.moveNextStep(algo=algo)
+            if new_pos == -1:
+                anim.pause()
 
             frame = camera.get_frame()
             if save_img:
