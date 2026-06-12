@@ -22,7 +22,8 @@ start_point = 0#10e3
 exposure_time = 1e3
 step_size = 500
 blur = 101 # Must be odd number
-algo = 'increment'
+algo = 'sweepAndClimb'
+#algo = 'increment'
 #algo = 'hillClimbing'
 
 # Folder structure: ../data/setup[setup number per journal]/YYYY_MM_DD/[slide offset]/[nr. of measurement]
