@@ -20,7 +20,7 @@ if __name__ == '__main__':
     pynq = pynq.PYNQ(DEBUG=False)
     pynq.connect()
     pynq.initMot()
-    exposure_time = 7e3
+    exposure_time = 1e3
     camera.set_exposure(exposure_time)
 
     camera.run()

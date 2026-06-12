@@ -15,13 +15,15 @@ from matplotlib.animation import FuncAnimation
 from scipy.optimize import curve_fit
 from PIL import Image
 from sklearn.metrics import r2_score
+import time
 
-iterations = 100
+iterations = 500
 start_point = 0#10e3
 exposure_time = 1e3
 step_size = 500
 blur = 101 # Must be odd number
-algo = 'hillClimbing'
+algo = 'increment'
+#algo = 'hillClimbing'
 
 # Folder structure: ../data/setup[setup number per journal]/YYYY_MM_DD/[slide offset]/[nr. of measurement]
 base_folder = '../data/trash'#'../data/setup4/2026_06_12/plus0mm'
@@ -68,6 +70,7 @@ if __name__ == '__main__':
     # Initialize the PYNQ board and camera
     positions = []
     sharpness = []
+    times = []
 
     pynq = pynq.PYNQ(DEBUG=False)  
     camera = Camera()
@@ -100,6 +103,9 @@ if __name__ == '__main__':
         pynq.moveToZero()
         pynq.moveAbsoluteSteps(start_point)
         frame = camera.get_frame()
+        start_time = time.time()
+        times.append(0)
+        
         positions.append(pynq.mot_absolute_steps)
 
         gray = camera.gaussian_blur(frame, blur=blur_matrix)
@@ -118,9 +124,11 @@ if __name__ == '__main__':
             #pynq.moveRelativeSteps(step_size)
             new_pos = algorithms.moveNextStep(algo=algo)
             if new_pos == -1:
+                logging.info('Algo converged, paused')
                 anim.pause()
 
             frame = camera.get_frame()
+            times.append(time.time()-start_time)
             if save_img:
                 Image.fromarray(frame).save(cc(f'img/{str(i)}.jpg'))
             
@@ -169,7 +177,8 @@ if __name__ == '__main__':
         fig.savefig(cc('tenegrad_vs_steps.png'))
 
         df = pd.DataFrame({ 'Position, steps' : positions,
-                            'Sharpness, -'    : sharpness})
+                            'Sharpness, -'    : sharpness,
+                            'Time, s'         : times})
         df.to_csv(cc('sharpness.csv'))
         
         pynq.moveToZero()

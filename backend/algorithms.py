@@ -14,11 +14,11 @@ class Algorithms:
         self.positions = positions
         self.sharpness = sharpness
 
-        self.increment_steps = 500
+        self.increment_steps = 2e3
         self.hill_climb_increment = 500
-        self.decrease_in_steps = -4 #divides the amount of steps taken by this number. 
+        self.decrease_in_steps = -2 #divides the amount of steps taken by this number. 
         # should always be negative to turn the image around.
-        self.smallest_steps = 50
+        self.smallest_steps = 2
 
     def moveNextStep(self,
                      algo: str) -> int:
@@ -43,16 +43,15 @@ class Algorithms:
         return self.pynq.mot_absolute_steps + self.increment_steps
     def hillClimbing(self):
         
-        if self.hill_climb_increment > self.smallest_steps:
-            if len(self.positions) == 0 or len(self.positions)== 1:
-                return self.pynq.mot_absolute_steps + self.hill_climb_increment
-            else: 
-                if self.sharpness[-1] > self.sharpness[-2]:
-                    return self.pynq.mot_absolute_steps + self.hill_climb_increment
-                elif self.sharpness[-1] < self.sharpness[-2]:
-                    self.hill_climb_increment = int(self.hill_climb_increment/self.decrease_in_steps)
-                    return self.pynq.mot_absolute_steps + self.hill_climb_increment
-        else: return -1
+        if abs(self.hill_climb_increment) < self.smallest_steps:
+            return -1 # Peak found with smallest_steps accuracy
+        
+        if len(self.positions) < 2:
+            return self.pynq.mot_absolute_steps + self.hill_climb_increment
+        
+        if self.sharpness[-1] < self.sharpness[-2]: # Reverse direction, half the step size
+            self.hill_climb_increment = int(self.hill_climb_increment/self.decrease_in_steps)
+        return self.pynq.mot_absolute_steps + self.hill_climb_increment
         
                 
         
