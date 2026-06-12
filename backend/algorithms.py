@@ -15,6 +15,10 @@ class Algorithms:
         self.sharpness = sharpness
 
         self.increment_steps = 500
+        self.hill_climb_increment = 500
+        self.decrease_in_steps = -4 #divides the amount of steps taken by this number. 
+        # should always be negative to turn the image around.
+        self.smallest_steps = 50
 
     def moveNextStep(self,
                      algo: str) -> int:
@@ -38,6 +42,18 @@ class Algorithms:
 
         return self.pynq.mot_absolute_steps + self.increment_steps
     def hillClimbing(self):
-        pass
+        
+        if self.hill_climb_increment > self.smallest_steps:
+            if self.positions.size == 0 or self.positions.size == 1:
+                return self.pynq.mot_absolute_steps + self.hill_climb_increment
+            else: 
+                if self.sharpness[self.sharpness.size] > self.sharpness[self.sharpness.size - 1]:
+                    return self.pynq.mot_absolute_steps + self.hill_climb_increment
+                elif self.sharpness[self.sharpness.size] < self.sharpness[self.sharpness.size - 1]:
+                    self.hill_climb_increment = int(self.hill_climb_increment/self.decrease_in_steps)
+                    return self.pynq.mot_absolute_steps + self.hill_climb_increment
+        else: return -1
+        
+                
         
 
