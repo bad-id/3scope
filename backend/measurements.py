@@ -44,12 +44,15 @@ if __name__ == '__main__':
         cv2.imshow("Basler Camera", frame)
         cv2.waitKey(1)
         
+        # Apply Gaussian blur
         gray = camera.gaussian_blur(frame)
-
+ 
+        # Check sharpness with three different methods
         sharpness = camera.check_sharpness(frame)
         tenengrad = camera.tenengrad(frame)
         tenengrad_and_gaussianblur = camera.tenengrad(gray)
 
+        # Add sharpness to list
         sharpness_list[i] = sharpness
         tenengrad_list[i] = tenengrad
         tenengrad_and_gaussianblur_list[i] = tenengrad_and_gaussianblur
@@ -59,6 +62,7 @@ if __name__ == '__main__':
     camera.stop()
     pynq.moveToZero()
 
+    # Prepare data for saving and graphing
     data = np.column_stack((steps_list, sharpness_list))
     data_tenengrad = np.column_stack((steps_list, tenengrad_list))
     data_tenengrad_gaussianblur = np.column_stack((steps_list, tenengrad_and_gaussianblur_list))
@@ -78,7 +82,7 @@ if __name__ == '__main__':
     np.savetxt(tenengrad_file, data_tenengrad)
     np.savetxt(tenengrad_and_gaussianblur_file, data_tenengrad_gaussianblur)
 
-    # Plot Sharpness
+    # Plot Sharpness against amount of steps
     plt.figure()
 
     plt.plot(steps_list, sharpness_list)
@@ -89,7 +93,7 @@ if __name__ == '__main__':
     sharpness_graph = os.path.join(MEAS_DIR, "sharpness_graph.png")
     plt.savefig(sharpness_graph, dpi=300, bbox_inches="tight")
 
-    # Plot Tenengrad
+    # Plot Tenengrad against amount of steps
     plt.figure()
 
     plt.plot(steps_list, tenengrad_list)
@@ -100,7 +104,7 @@ if __name__ == '__main__':
     tenengrad_graph = os.path.join(MEAS_DIR, "tenengrad_graph.png")
     plt.savefig(tenengrad_graph, dpi=300, bbox_inches="tight")
 
-    # Plot Tenengrad with gaussian blur
+    # Plot Tenengrad with gaussian blur against amount of steps
     plt.figure()
 
     plt.plot(steps_list, tenengrad_and_gaussianblur_list)
