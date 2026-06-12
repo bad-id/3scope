@@ -13,6 +13,9 @@ class Camera(Device):
         self.camera = None
 
     def connect(self):
+        """
+        This function attempts to connect to the camera
+        """
         try:
             # Connect to camera
             self.camera = pylon.InstantCamera(
@@ -32,18 +35,30 @@ class Camera(Device):
         return self.connected
 
     def start(self):
+        """
+        This function makes the camera start
+        """
         self.camera.StartGrabbing(pylon.GrabStrategy_LatestImageOnly)
 
     def stop(self):
+        """
+        This function makes the camera stop
+        """
         self.started = False
         self.camera.StopGrabbing()
         self.camera.Close()
         cv2.destroyAllWindows()
 
     def set_exposure(self, exposure_time_us):
+        """
+        This function sets the camera exposure using the functi0n argument
+        """
         self.camera.ExposureTime.SetValue(exposure_time_us)
         
     def get_frame(self):
+        """
+        This function returns the image at that instant in an 1920 x 1080 array
+        """
         grabResult = self.camera.RetrieveResult(
             5000, pylon.TimeoutHandling_ThrowException
         )
@@ -58,14 +73,25 @@ class Camera(Device):
         return None
 
     def gaussian_blur(self, image, blur=(3,3)):
+        """
+        This function applies a variable Gaussian blur. The image-array, kernel size
+        and standard deviation are function arguments.  
+        """
         blurred_image = cv2.GaussianBlur(image, blur, 0)
         return blurred_image
 
     def check_sharpness(self, image):
+        """
+        This function checks the sharpness using the built in Laplacian function from the cv2 library
+        """
         #The value gets higher when the picture gets sharper
         return cv2.Laplacian(image, cv2.CV_64F).var()
 
     def tenengrad(self, image):
+        """
+        This function uses the Sobel operator to compute the local partial derivatives
+        and adds returns the mean value.
+        """
         gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         gx = cv2.Sobel(gray_image, cv2.CV_64F, 1, 0, ksize=3)
@@ -76,6 +102,10 @@ class Camera(Device):
         return np.mean(g)
 
     def run(self):
+        """
+        This function initializes the camera and starts grabbing images until "q" is pressed.
+        Then it stops the camera and returns the sharpness value of the latest frame.
+        """
         self.start()
 
         while self.camera.IsGrabbing():
