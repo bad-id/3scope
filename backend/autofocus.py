@@ -2,9 +2,8 @@ from camera import Camera
 from pynq import PYNQ
 import numpy as np
 
+
 def autofocus(
-        pynq: PYNQ,
-        camera: Camera,
         wanted_sharpness: float,
         number_steps: int,
         decrease_in_steps: int,
@@ -23,6 +22,8 @@ def autofocus(
     """
     #initialise frequentie and direction
     direction = 1
+    camera = Camera()
+    pynq=PYNQ()
     #get an image
     camera.start()
     image = camera.get_frame()
@@ -63,6 +64,12 @@ def autofocus(
                 focus_values_array.append(focus_value)
                 i = i + 1
     return camera.get_frame()
+
+def main():
+    autofocus()
+
+if __name__ == "__main__":
+    main()
         
 
 
