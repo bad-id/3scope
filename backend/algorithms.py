@@ -3,6 +3,7 @@ The different autofocusing algorithms
 '''
 import numpy as np
 from pynq import PYNQ
+import scipy 
 
 class Algorithms:
     def __init__(self,
@@ -23,6 +24,8 @@ class Algorithms:
         # should always be negative to turn the image around.
         self.smallest_steps = 2
 
+        #the prominance used for climb and stop.
+        self.set_prominence = 3
     def moveNextStep(self,
                      algo: str) -> int:
         assert algo in self.algos
@@ -69,4 +72,19 @@ class Algorithms:
             next_pos = self.hillClimbing()
 
         return next_pos
+    def SweepStopClimb(self) -> int:
+        next_pos = -1
+        peaks, properties = scipy.find_peaks(self.posistions, prominence=0)
+        if properties["prominence"][-1]>=self.set_prominence:
+            next_pos = self.hillClimbing()
+        elif self.num_iterations < 10:
+            self.increment_steps = self.pynq.MOT_LIMITS[1]/10
+            next_pos = self.increment()
+        elif self.num_iterations == 10:
+            next_pos = self.positions[self.sharpness.index(max(self.sharpness))]
+        else:
+            next_pos = self.hillClimbing()
+        return next_pos
+
+
         
