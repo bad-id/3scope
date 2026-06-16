@@ -2,7 +2,7 @@
 Displays live plot of camera and sharpness parameter, tries fitting a gauss curve
 '''
 
-import pynq
+from pynq import PYNQ
 from autofocus import autofocus
 from camera import Camera
 from algorithms import Algorithms
@@ -17,19 +17,44 @@ from PIL import Image
 from sklearn.metrics import r2_score
 import time
 
+class Config():
+    def __init__(self,
+                 FIT_live: bool,
+                 iterations: int,
+                 start_point: int,
+                 exposure_time: int,
+                 step_size: int,
+                 blur: int,
+                 algo: str):
+        self.FIT_live: bool = FIT_live
+        self.iterations: int = iterations
+        self.start_point: int = start_point
+        self.exposure_time: int = exposure_time
+        self.step_size: int = step_size
+        self.blur: int = blur
+        self.algo: str = algo
+
+exposure_time = 1e3
+configs: list[Config] = [
+    Config(False, 30, 0, exposure_time, 8e3, 101, 'SweepStopClimb'),
+    Config(False, 30, 0, exposure_time, 8e3, 101, 'sweepAndClimb'),
+    Config(False, 100, 0, exposure_time, 400, 101, 'increment'),
+] 
+
 FIT_LIVE = False
 iterations = 30
 start_point = 0#10e3
 exposure_time = 2e3
 step_size = 8e3
-blur = 51 # Must be odd number
-algo = 'doubleGaussAndClimb'
+blur = 101 # Must be odd number
+algo = 'SweepStopClimb'
+#algo = 'doubleGaussAndClimb'
 #algo = 'sweepAndClimb'
 #algo = 'increment'
 #algo = 'hillClimbing'
 
 # Folder structure: ../data/setup[setup number per journal]/YYYY_MM_DD/[slide offset]/[nr. of measurement]
-base_folder = '../data/trash2'#'../data/setup4/2026_06_12/plus0mm'
+base_folder = '../data/setup4/2026_06_16/plus10mm'#'../data/trash2'#'../data/setup4/2026_06_12/plus0mm'
 save_img = True
 
 folder = ''
@@ -52,18 +77,10 @@ def gauss0(x, a, b, c):
 def gauss(x, a, b, c, d, e, f):
     return gauss0(x, a, b, c)+gauss0(x, d, e, f)
 
-if __name__ == '__main__':
-    # Initialize folder structure
-    if not os.path.exists(base_folder):
-        os.makedirs(base_folder)
 
-    nr_of_measurement = 1
-    subfolders = [ int(f.name) for f in os.scandir(base_folder) if f.is_dir() ]
-    if len(subfolders) > 0:
-        nr_of_measurement = max(subfolders) +1 # Increment folder name by one
-
-    folder = os.path.join(base_folder, str(nr_of_measurement))
-    os.mkdir(folder)
+def run_with_global_conf(pynq: PYNQ,
+                         camera: Camera):
+    os.makedirs(folder)
     os.mkdir(cc('img'))
 
     # Init logging
@@ -77,18 +94,11 @@ if __name__ == '__main__':
     sharpness = []
     times = []
 
-    pynq = pynq.PYNQ(DEBUG=False)  
-    camera = Camera()
-
     algorithms = Algorithms(pynq=pynq,
                             positions=positions,
                             sharpness=sharpness)
     algorithms.increment_steps = step_size
-    if (camera.connect() and pynq.connect()):
-        logging.info(pynq.idn)
-        pynq.initMot()
-
-        camera.start()
+    if True:#(camera.connect() and pynq.connect()):
         camera.set_exposure(exposure_time)
 
         fig, (ax1, ax2) = plt.subplots(1,2)
@@ -129,8 +139,8 @@ if __name__ == '__main__':
         def animate(i): 
             #pynq.moveRelativeSteps(step_size)
             new_pos = algorithms.moveNextStep(algo=algo)
+            frame = camera.get_frame()
             if new_pos >= 0:
-                frame = camera.get_frame()
                 times.append(time.time()-start_time)
                 if save_img:
                     Image.fromarray(frame).save(cc(f'img/{str(i)}.jpg'))
@@ -165,7 +175,10 @@ if __name__ == '__main__':
 
             if new_pos == -1:
                 logging.info('Algo converged, paused')
-                anim.pause()
+                if FIT_LIVE:
+                    anim.pause()
+                else:
+                    plt.close()
             # Update image            
             im.set_array(frame)
             return line1, fit_line, im
@@ -192,3 +205,34 @@ if __name__ == '__main__':
     
     else:
         logging.error("Error connecting")
+    
+if __name__ == '__main__':
+    # Initialize folder structure
+    pynq = PYNQ(DEBUG=False)  
+    camera = Camera()
+    if (camera.connect() and pynq.connect()):
+        pass
+    logging.info(pynq.idn)
+    pynq.initMot()
+
+    camera.start()
+
+    if not os.path.exists(base_folder):
+        os.makedirs(base_folder)
+
+    nr_of_measurement = 1
+    subfolders = [ int(f.name) for f in os.scandir(base_folder) if f.is_dir() ]
+    if len(subfolders) > 0:
+        nr_of_measurement = max(subfolders) +1 # Increment folder name by one
+
+    for config in configs:
+        FIT_LIVE = config.FIT_live
+        iterations = config.iterations
+        start_point = config.start_point
+        exposure_time = config.exposure_time
+        step_size = config.step_size
+        blur = config.blur # Must be odd number
+        algo = config.algo
+
+        folder = os.path.join(base_folder, str(nr_of_measurement), algo)
+        run_with_global_conf(pynq, camera)

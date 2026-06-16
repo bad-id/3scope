@@ -4,6 +4,7 @@ The different autofocusing algorithms
 import numpy as np
 from pynq import PYNQ
 from scipy.optimize import curve_fit
+from scipy.signal import find_peaks
 from PIL import Image
 from sklearn.metrics import r2_score
 import logging
@@ -22,7 +23,7 @@ class Algorithms:
             pynq: PYNQ,
             positions: np.ndarray,
             sharpness: np.ndarray):
-        self.algos = ['increment', 'hillClimbing', 'sweepAndClimb', 'doubleGaussAndClimb']
+        self.algos = ['increment', 'hillClimbing', 'sweepAndClimb', 'doubleGaussAndClimb', 'SweepStopClimb']
         self.pynq = pynq
         self.positions = positions
         self.sharpness = sharpness
@@ -37,7 +38,7 @@ class Algorithms:
         self.smallest_steps = 2
 
         #the prominance used for climb and stop.
-        self.set_prominence = 3
+        self.set_prominence = 1.5
     def moveNextStep(self,
                      algo: str) -> int:
         assert algo in self.algos
@@ -53,6 +54,8 @@ class Algorithms:
                 next_pos = self.sweepAndClimb()
             case 'doubleGaussAndClimb':
                 next_pos = self.doubleGaussAndClimb()
+            case 'SweepStopClimb':
+                next_pos = self.SweepStopClimb()
 
         if next_pos != -1:
             self.pynq.moveAbsoluteSteps(next_pos)
@@ -88,10 +91,16 @@ class Algorithms:
         return next_pos
     def SweepStopClimb(self) -> int:
         next_pos = -1
-        peaks, properties = scipy.find_peaks(self.posistions, prominence=0)
-        if properties["prominence"][-1]>=self.set_prominence:
-            next_pos = self.hillClimbing()
-        elif self.num_iterations < 10:
+        best_peak_prominance = -1
+
+        
+        peaks, properties = find_peaks(self.sharpness, prominence=0)
+        if len(peaks) > 0:
+            best_peak_prominance   = properties["prominences"].max()
+            biggest_peak_i = np.where(properties["prominences"] == best_peak_prominance)
+            next_pos = self.positions[biggest_peak_i[0][0]]
+
+        if (best_peak_prominance < self.set_prominence) and (self.num_iterations < 10):
             self.increment_steps = self.pynq.MOT_LIMITS[1]/10
             next_pos = self.increment()
         elif self.num_iterations == 10:
