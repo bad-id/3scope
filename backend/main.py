@@ -17,17 +17,19 @@ from PIL import Image
 from sklearn.metrics import r2_score
 import time
 
-iterations = 500
+FIT_LIVE = False
+iterations = 30
 start_point = 0#10e3
-exposure_time = 1e3
-step_size = 500
-blur = 101 # Must be odd number
-algo = 'sweepAndClimb'
+exposure_time = 2e3
+step_size = 8e3
+blur = 51 # Must be odd number
+algo = 'doubleGaussAndClimb'
+#algo = 'sweepAndClimb'
 #algo = 'increment'
 #algo = 'hillClimbing'
 
 # Folder structure: ../data/setup[setup number per journal]/YYYY_MM_DD/[slide offset]/[nr. of measurement]
-base_folder = '../data/trash'#'../data/setup4/2026_06_12/plus0mm'
+base_folder = '../data/trash2'#'../data/setup4/2026_06_12/plus0mm'
 save_img = True
 
 folder = ''
@@ -42,11 +44,13 @@ def cc(filename: str) -> str:
     '''
     return os.path.join(folder, filename)
 
-def gauss(x, a, b, c):
+def gauss0(x, a, b, c):
     '''
     Function used to fit sharpness vs steps
     '''
     return a*np.exp(- ((x-b)**2)/(2*(c**2)))
+def gauss(x, a, b, c, d, e, f):
+    return gauss0(x, a, b, c)+gauss0(x, d, e, f)
 
 if __name__ == '__main__':
     # Initialize folder structure
@@ -79,6 +83,7 @@ if __name__ == '__main__':
     algorithms = Algorithms(pynq=pynq,
                             positions=positions,
                             sharpness=sharpness)
+    algorithms.increment_steps = step_size
     if (camera.connect() and pynq.connect()):
         logging.info(pynq.idn)
         pynq.initMot()
@@ -124,42 +129,43 @@ if __name__ == '__main__':
         def animate(i): 
             #pynq.moveRelativeSteps(step_size)
             new_pos = algorithms.moveNextStep(algo=algo)
+            if new_pos >= 0:
+                frame = camera.get_frame()
+                times.append(time.time()-start_time)
+                if save_img:
+                    Image.fromarray(frame).save(cc(f'img/{str(i)}.jpg'))
+                
+                positions.append(pynq.mot_absolute_steps)
+
+                gray = camera.gaussian_blur(frame, blur=blur_matrix)
+                sharp = camera.tenengrad(gray)
+                sharpness.append(sharp)
+                line1.set_data(positions, sharpness)
+
+                ax1.set_xlim(positions[0], positions[-1])
+                ax1.set_ylim(np.min(sharpness), np.max(sharpness))
+
+            # Fit a gauss curve
+            if FIT_LIVE == True or new_pos == -1:
+                if len(sharpness) > 6:
+                    try:
+                        popt, pcov = curve_fit(gauss,
+                                            positions,
+                                            sharpness,
+                                            p0=(3.5, 18e3, 1e3, 1, 40e3, 2e3))
+                        perr = np.sqrt(np.diag(pcov))
+                        r_squared = r2_score(sharpness, gauss(positions, *popt))
+                        logging.info(f'{popt} R^2: {r_squared}')
+
+                        fit_positions = np.linspace(np.min(positions), np.max(positions), num=int(np.max(positions)-np.min(positions)))
+                        fit_sharpness = gauss(fit_positions, *popt)
+                        fit_line.set_data(fit_positions, fit_sharpness)
+                    except RuntimeError:
+                        logging.error('Optimal not found')
+
             if new_pos == -1:
                 logging.info('Algo converged, paused')
                 anim.pause()
-
-            frame = camera.get_frame()
-            times.append(time.time()-start_time)
-            if save_img:
-                Image.fromarray(frame).save(cc(f'img/{str(i)}.jpg'))
-            
-            positions.append(pynq.mot_absolute_steps)
-
-            gray = camera.gaussian_blur(frame, blur=blur_matrix)
-            sharp = camera.tenengrad(gray)
-            sharpness.append(sharp)
-            line1.set_data(positions, sharpness)
-
-            ax1.set_xlim(positions[0], positions[-1])
-            ax1.set_ylim(np.min(sharpness), np.max(sharpness))
-
-            # Fit a gauss curve
-            if len(sharpness) > 4:
-                try:
-                    popt, pcov = curve_fit(gauss,
-                                        positions,
-                                        sharpness,
-                                        p0=(3.5, 18e3, 1e3))
-                    perr = np.sqrt(np.diag(pcov))
-                    r_squared = r2_score(sharpness, gauss(positions, *popt))
-                    logging.info(f'{popt} R^2: {r_squared}')
-
-                    fit_positions = np.linspace(np.min(positions), np.max(positions), num=int(np.max(positions)-np.min(positions)))
-                    fit_sharpness = gauss(fit_positions, *popt)
-                    fit_line.set_data(fit_positions, fit_sharpness)
-                except RuntimeError:
-                    logging.error('Optimal not found')
-
             # Update image            
             im.set_array(frame)
             return line1, fit_line, im
